@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/migration.schema.json",
+  "$ref": "#/$defs/MigrationDryRun",
+  "$defs": {
+    "IsoDateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "NonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "MigrationSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rootPath", "includePaths"],
+      "properties": {
+        "rootPath": { "$ref": "#/$defs/NonEmptyString" },
+        "includePaths": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NonEmptyString" }
+        }
+      }
+    },
+    "MigrationTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["libraryRootPath"],
+      "properties": {
+        "libraryRootPath": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "MigrationItemTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "libraryRelativePath"],
+      "properties": {
+        "kind": {
+          "enum": ["source", "analysis", "work", "unsupported"]
+        },
+        "libraryRelativePath": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "MigrationItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relativePath",
+        "contentHash",
+        "target",
+        "status",
+        "scope"
+      ],
+      "properties": {
+        "relativePath": { "$ref": "#/$defs/NonEmptyString" },
+        "contentHash": { "$ref": "#/$defs/NonEmptyString" },
+        "target": { "$ref": "#/$defs/MigrationItemTarget" },
+        "status": {
+          "enum": ["migratable", "blocked"]
+        },
+        "scope": { "$ref": "#/$defs/NonEmptyString" },
+        "blockedReason": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "MigrationReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "generatedAt",
+        "totalFiles",
+        "migratableFiles",
+        "blockedFiles",
+        "sourceTreeHash"
+      ],
+      "properties": {
+        "kind": { "const": "migration-report" },
+        "generatedAt": { "$ref": "#/$defs/IsoDateTime" },
+        "totalFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "migratableFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blockedFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sourceTreeHash": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "MigrationDryRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "generatedAt",
+        "source",
+        "target",
+        "items",
+        "report"
+      ],
+      "properties": {
+        "kind": { "const": "migration-dry-run" },
+        "generatedAt": { "$ref": "#/$defs/IsoDateTime" },
+        "source": { "$ref": "#/$defs/MigrationSource" },
+        "target": { "$ref": "#/$defs/MigrationTarget" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/MigrationItem" }
+        },
+        "report": { "$ref": "#/$defs/MigrationReport" }
+      }
+    }
+  }
+}

@@ -27,6 +27,31 @@ The runtime library is ignored by Git.
 5. The app writes migrated records into the local library.
 6. The app writes a migration report.
 
+## 9.3 Dry-Run Contract
+
+The 9.3 implementation exposes a dry-run only path:
+
+- Rust core: `dry_run_private_corpus_migration`
+- Tauri command: `dry_run_private_corpus_migration_command`
+- TypeScript contract module: `src/features/migration`
+- JSON Schema: `schemas/migration.schema.json`
+
+`MigrationDryRun` returns only metadata:
+
+- `MigrationSource`: selected local root and optional relative include paths.
+- `MigrationTarget`: selected local library root.
+- `MigrationItem`: relative source path, target record kind, stable content hash, scope, status, and blocked reason.
+- `MigrationReport`: counts and a stable source tree hash.
+
+The dry-run result does not include file contents. It also does not create target library directories or migrated records.
+
+## Path And Hash Rules
+
+- Include paths must be relative to the selected source root.
+- Absolute include paths and parent-directory traversal are rejected before scanning.
+- Each scanned path is checked with its canonical path before it is reported.
+- Hashes are stable across source root locations because they are based on relative paths and bytes, not absolute local paths.
+
 ## Safety Rules
 
 - Never commit imported private data.
