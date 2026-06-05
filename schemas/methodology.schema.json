@@ -1,0 +1,332 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/methodology.schema.json",
+  "$ref": "#/$defs/ContextPack",
+  "$defs": {
+    "IsoDateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "NonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "StringList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/NonEmptyString"
+      }
+    },
+    "SourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "title", "locator"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/NonEmptyString" },
+        "title": { "$ref": "#/$defs/NonEmptyString" },
+        "locator": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "EvidenceLocator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locator", "summary"],
+      "properties": {
+        "locator": { "$ref": "#/$defs/NonEmptyString" },
+        "summary": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "EvidenceCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "notes"],
+      "properties": {
+        "scope": { "$ref": "#/$defs/NonEmptyString" },
+        "notes": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "ConfidenceRating": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "rationale"],
+      "properties": {
+        "level": {
+          "enum": ["low", "medium", "high"]
+        },
+        "rationale": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "EvidenceCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "source",
+        "evidence",
+        "observedTechnique",
+        "sourceFunction",
+        "transferableMechanism",
+        "forbiddenCopy",
+        "coverage",
+        "confidence",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "evidence-card" },
+        "source": { "$ref": "#/$defs/SourceReference" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/EvidenceLocator" }
+        },
+        "observedTechnique": { "$ref": "#/$defs/NonEmptyString" },
+        "sourceFunction": { "$ref": "#/$defs/NonEmptyString" },
+        "transferableMechanism": { "$ref": "#/$defs/NonEmptyString" },
+        "forbiddenCopy": { "$ref": "#/$defs/StringList" },
+        "coverage": { "$ref": "#/$defs/EvidenceCoverage" },
+        "confidence": { "$ref": "#/$defs/ConfidenceRating" },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "ReaderContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "promise",
+        "progress",
+        "payoff",
+        "tone",
+        "emotionalTarget",
+        "evidenceCardIds"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "reader-contract" },
+        "promise": { "$ref": "#/$defs/NonEmptyString" },
+        "progress": { "$ref": "#/$defs/NonEmptyString" },
+        "payoff": { "$ref": "#/$defs/NonEmptyString" },
+        "tone": { "$ref": "#/$defs/NonEmptyString" },
+        "emotionalTarget": { "$ref": "#/$defs/NonEmptyString" },
+        "evidenceCardIds": { "$ref": "#/$defs/StringList" }
+      }
+    },
+    "KnowledgeBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "pov",
+        "narratorKnows",
+        "readerKnows",
+        "withheldInformation",
+        "unreliable"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "knowledge-boundary" },
+        "pov": { "$ref": "#/$defs/NonEmptyString" },
+        "narratorKnows": { "$ref": "#/$defs/StringList" },
+        "readerKnows": { "$ref": "#/$defs/StringList" },
+        "withheldInformation": { "$ref": "#/$defs/StringList" },
+        "unreliable": { "type": "boolean" }
+      }
+    },
+    "SettingPressure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "settingElement",
+        "restriction",
+        "resource",
+        "cost",
+        "choiceImpact"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "setting-pressure" },
+        "settingElement": { "$ref": "#/$defs/NonEmptyString" },
+        "restriction": { "$ref": "#/$defs/NonEmptyString" },
+        "resource": { "$ref": "#/$defs/NonEmptyString" },
+        "cost": { "$ref": "#/$defs/NonEmptyString" },
+        "choiceImpact": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "ReferenceMechanism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "evidenceCardId",
+        "mechanism",
+        "transferRules",
+        "forbiddenCopies"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "reference-mechanism" },
+        "evidenceCardId": { "$ref": "#/$defs/NonEmptyString" },
+        "mechanism": { "$ref": "#/$defs/NonEmptyString" },
+        "transferRules": { "$ref": "#/$defs/StringList" },
+        "forbiddenCopies": { "$ref": "#/$defs/StringList" }
+      }
+    },
+    "SceneCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "workId",
+        "title",
+        "pov",
+        "knowledgeBoundaryId",
+        "settingPressureIds",
+        "readerContractId",
+        "characterGoals",
+        "conflictAgenda",
+        "revealedInformation",
+        "hiddenInformation",
+        "stateChange",
+        "turn"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "scene-card" },
+        "workId": { "$ref": "#/$defs/NonEmptyString" },
+        "title": { "$ref": "#/$defs/NonEmptyString" },
+        "pov": { "$ref": "#/$defs/NonEmptyString" },
+        "knowledgeBoundaryId": { "$ref": "#/$defs/NonEmptyString" },
+        "settingPressureIds": { "$ref": "#/$defs/StringList" },
+        "readerContractId": { "$ref": "#/$defs/NonEmptyString" },
+        "characterGoals": { "$ref": "#/$defs/StringList" },
+        "conflictAgenda": { "$ref": "#/$defs/NonEmptyString" },
+        "revealedInformation": { "$ref": "#/$defs/StringList" },
+        "hiddenInformation": { "$ref": "#/$defs/StringList" },
+        "stateChange": { "$ref": "#/$defs/NonEmptyString" },
+        "turn": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "DraftReviewItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "severity",
+        "category",
+        "finding",
+        "recommendation",
+        "evidenceCardIds"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "draft-review-item" },
+        "targetId": { "$ref": "#/$defs/NonEmptyString" },
+        "severity": {
+          "enum": ["low", "medium", "high"]
+        },
+        "category": { "$ref": "#/$defs/NonEmptyString" },
+        "finding": { "$ref": "#/$defs/NonEmptyString" },
+        "recommendation": { "$ref": "#/$defs/NonEmptyString" },
+        "evidenceCardIds": { "$ref": "#/$defs/StringList" }
+      }
+    },
+    "ChangeSetEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targetId", "changeType", "description"],
+      "properties": {
+        "targetId": { "$ref": "#/$defs/NonEmptyString" },
+        "changeType": {
+          "enum": ["create", "update", "remove"]
+        },
+        "description": { "$ref": "#/$defs/NonEmptyString" }
+      }
+    },
+    "ChangeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "createdAt", "summary", "changes", "affectedIds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "change-set" },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "summary": { "$ref": "#/$defs/NonEmptyString" },
+        "changes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ChangeSetEntry" }
+        },
+        "affectedIds": { "$ref": "#/$defs/StringList" }
+      }
+    },
+    "ContextPack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "createdAt",
+        "updatedAt",
+        "purpose",
+        "evidenceCards",
+        "readerContracts",
+        "knowledgeBoundaries",
+        "settingPressures",
+        "referenceMechanisms",
+        "sceneCards",
+        "draftReviewItems",
+        "changeSets"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/NonEmptyString" },
+        "kind": { "const": "context-pack" },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" },
+        "purpose": { "$ref": "#/$defs/NonEmptyString" },
+        "evidenceCards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/EvidenceCard" }
+        },
+        "readerContracts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ReaderContract" }
+        },
+        "knowledgeBoundaries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/KnowledgeBoundary" }
+        },
+        "settingPressures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SettingPressure" }
+        },
+        "referenceMechanisms": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ReferenceMechanism" }
+        },
+        "sceneCards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SceneCard" }
+        },
+        "draftReviewItems": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DraftReviewItem" }
+        },
+        "changeSets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ChangeSet" }
+        }
+      }
+    }
+  }
+}

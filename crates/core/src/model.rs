@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+pub mod methodology;
+
 pub type IsoDateTime = String;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
