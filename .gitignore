@@ -1,0 +1,35 @@
+# Private corpus and user data
+[tT]extbook/
+[a]nalysis/
+library/
+userData/
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+
+# Logs and caches
+*.log
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+build/
+release/
+target/
+.cache/
+.vite/
+
+# Local AI/job artifacts
+runs/
+ai/jobs/
+*.stdout
+*.stderr

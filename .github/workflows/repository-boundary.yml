@@ -1,0 +1,21 @@
+name: Repository Boundary
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  repository-boundary:
+    name: Repository boundary
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run repository boundary check
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File tests/repository-boundary.ps1
