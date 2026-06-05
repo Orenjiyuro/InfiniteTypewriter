@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/library.schema.json",
+  "$ref": "#/$defs/LibraryManifest",
+  "$defs": {
+    "IsoDateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "LibraryRoot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "path"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "SourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "title", "contentHash", "createdAt", "updatedAt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "source"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "WorkRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "title", "createdAt", "updatedAt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "work"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "AnalysisRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "sourceId", "title", "createdAt", "updatedAt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "analysis"
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "LibraryManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "root",
+        "createdAt",
+        "updatedAt",
+        "sources",
+        "works",
+        "analyses"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "root": {
+          "$ref": "#/$defs/LibraryRoot"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRecord"
+          }
+        },
+        "works": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WorkRecord"
+          }
+        },
+        "analyses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AnalysisRecord"
+          }
+        }
+      }
+    }
+  }
+}

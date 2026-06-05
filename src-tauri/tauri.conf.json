@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "InfiniteTypewriter",
+  "version": "0.1.0",
+  "identifier": "com.infinite-typewriter.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "InfiniteTypewriter",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 920,
+        "minHeight": 640
+      }
+    ]
+  },
+  "bundle": {
+    "active": false,
+    "targets": "all"
+  }
+}

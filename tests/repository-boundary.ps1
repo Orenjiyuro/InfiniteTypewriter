@@ -144,8 +144,6 @@ foreach ($samplePath in $ignoreSamples) {
 
 $packageConfigCandidates = @(
     'package.json',
-    'package-lock.json',
-    'npm-shrinkwrap.json',
     'src-tauri/tauri.conf.json',
     'src-tauri/tauri.conf.json5',
     'src-tauri/Tauri.toml',

@@ -27,6 +27,7 @@ release/
 target/
 .cache/
 .vite/
+src-tauri/gen/
 
 # Local AI/job artifacts
 runs/
