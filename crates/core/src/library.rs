@@ -7,9 +7,7 @@ use rusqlite::{params, Connection};
 
 use crate::model::{create_empty_manifest, LibraryManifest, LibraryRoot};
 
-const LOCAL_DIRECTORIES: &[&str] = &[
-    "sources", "analyses", "works", "runs", "recipes", "indexes",
-];
+const LOCAL_DIRECTORIES: &[&str] = &["sources", "analyses", "works", "runs", "recipes", "indexes"];
 
 #[derive(Debug)]
 pub enum LibraryError {
@@ -23,7 +21,9 @@ impl std::fmt::Display for LibraryError {
         match self {
             Self::Io(error) => write!(formatter, "library file operation failed: {error}"),
             Self::Sqlite(error) => write!(formatter, "library SQLite operation failed: {error}"),
-            Self::Json(error) => write!(formatter, "library manifest serialization failed: {error}"),
+            Self::Json(error) => {
+                write!(formatter, "library manifest serialization failed: {error}")
+            }
         }
     }
 }
@@ -174,11 +174,14 @@ mod tests {
         assert!(manifest.analyses.is_empty());
 
         for directory in ["sources", "analyses", "works", "runs", "recipes", "indexes"] {
-            assert!(root_path.join(directory).is_dir(), "{directory} should exist");
+            assert!(
+                root_path.join(directory).is_dir(),
+                "{directory} should exist"
+            );
         }
 
-        let manifest_json =
-            fs::read_to_string(root_path.join("manifest.json")).expect("manifest should be written");
+        let manifest_json = fs::read_to_string(root_path.join("manifest.json"))
+            .expect("manifest should be written");
         assert!(manifest_json.contains("\"schemaVersion\": 1"));
 
         fs::remove_dir_all(root_path).expect("test library should clean up");
@@ -196,8 +199,8 @@ mod tests {
         )
         .expect("empty library should initialize");
 
-        let connection =
-            Connection::open(root_path.join("indexes").join("catalog.sqlite")).expect("catalog opens");
+        let connection = Connection::open(root_path.join("indexes").join("catalog.sqlite"))
+            .expect("catalog opens");
         let table_count: u32 = connection
             .query_row(
                 "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('library_manifest', 'sources', 'works', 'analyses')",
@@ -206,7 +209,9 @@ mod tests {
             )
             .expect("tables should be queryable");
         let manifest_count: u32 = connection
-            .query_row("SELECT COUNT(*) FROM library_manifest", [], |row| row.get(0))
+            .query_row("SELECT COUNT(*) FROM library_manifest", [], |row| {
+                row.get(0)
+            })
             .expect("manifest row should be queryable");
 
         assert_eq!(table_count, 4);

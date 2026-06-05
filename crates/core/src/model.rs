@@ -74,7 +74,10 @@ pub struct LibraryManifest {
     pub analyses: Vec<AnalysisRecord>,
 }
 
-pub fn create_empty_manifest(root: LibraryRoot, timestamp: impl Into<IsoDateTime>) -> LibraryManifest {
+pub fn create_empty_manifest(
+    root: LibraryRoot,
+    timestamp: impl Into<IsoDateTime>,
+) -> LibraryManifest {
     let timestamp = timestamp.into();
 
     LibraryManifest {

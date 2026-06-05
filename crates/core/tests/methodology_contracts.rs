@@ -7,8 +7,7 @@ fn context_pack_fixture_round_trips() {
 
     let context_pack: ContextPack =
         serde_json::from_value(fixture.clone()).expect("fixture should deserialize");
-    let round_tripped =
-        serde_json::to_value(context_pack).expect("context pack should serialize");
+    let round_tripped = serde_json::to_value(context_pack).expect("context pack should serialize");
 
     assert_eq!(round_tripped, fixture);
 }

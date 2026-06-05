@@ -255,9 +255,7 @@ impl EvidenceCardValidationError {
     }
 }
 
-pub fn validate_evidence_card_value(
-    value: &Value,
-) -> Result<(), EvidenceCardValidationError> {
+pub fn validate_evidence_card_value(value: &Value) -> Result<(), EvidenceCardValidationError> {
     let mut missing_fields = Vec::new();
 
     if value.get("evidence").is_none_or(Value::is_null) {
@@ -323,7 +321,9 @@ pub fn validate_evidence_card_value(
 }
 
 fn has_text(value: Option<&Value>) -> bool {
-    value.and_then(Value::as_str).is_some_and(|text| !text.is_empty())
+    value
+        .and_then(Value::as_str)
+        .is_some_and(|text| !text.is_empty())
 }
 
 fn evidence_locator_path(index: usize) -> &'static str {
