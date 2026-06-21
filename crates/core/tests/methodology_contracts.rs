@@ -1,11 +1,11 @@
-use infinite_typewriter_core::{validate_evidence_card_value, ContextPack};
+use infinite_typewriter_core::{validate_evidence_card_value, MethodologySeedBundle};
 use serde_json::json;
 
 #[test]
 fn context_pack_fixture_round_trips() {
     let fixture = public_safe_context_pack_fixture();
 
-    let context_pack: ContextPack =
+    let context_pack: MethodologySeedBundle =
         serde_json::from_value(fixture.clone()).expect("fixture should deserialize");
     let round_tripped = serde_json::to_value(context_pack).expect("context pack should serialize");
 
@@ -64,10 +64,34 @@ fn evidence_card_rejects_empty_or_incomplete_evidence_fields() {
     assert_eq!(error.missing_fields(), &["confidence.rationale"]);
 }
 
+#[test]
+fn evidence_card_reports_indexed_paths_for_each_incomplete_evidence_item() {
+    let fixture = public_safe_context_pack_fixture();
+    let mut card = fixture["evidenceCards"][0].clone();
+    card["evidence"] = json!([
+        {
+            "locator": "chapter-1-scene-1",
+            "summary": "Invented public example: a first evidence item is complete."
+        },
+        {
+            "locator": "",
+            "summary": ""
+        }
+    ]);
+
+    let error = validate_evidence_card_value(&card)
+        .expect_err("incomplete evidence items should be rejected");
+
+    assert_eq!(
+        error.missing_fields(),
+        &["evidence[1].locator", "evidence[1].summary"]
+    );
+}
+
 fn public_safe_context_pack_fixture() -> serde_json::Value {
     json!({
-        "id": "context-pack-toy",
-        "kind": "context-pack",
+        "id": "methodology-seed-bundle-toy",
+        "kind": "methodology-seed-bundle",
         "createdAt": "2026-06-05T00:00:00.000Z",
         "updatedAt": "2026-06-05T00:00:00.000Z",
         "purpose": "Toy original planning context",

@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/simulation.schema.json",
+  "$ref": "#/$defs/SimulationContext",
+  "$defs": {
+    "Text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "TextList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Text"
+      }
+    },
+    "ActionCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "simulationContextId",
+        "actorId",
+        "action",
+        "motivation",
+        "expectedConsequence",
+        "supportingRefs",
+        "riskFlags"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "simulationContextId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "actorId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "action": {
+          "$ref": "#/$defs/Text"
+        },
+        "motivation": {
+          "$ref": "#/$defs/Text"
+        },
+        "expectedConsequence": {
+          "$ref": "#/$defs/Text"
+        },
+        "supportingRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "riskFlags": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        }
+      }
+    },
+    "PuppeteeringRisk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "actionCandidateId",
+        "riskKind",
+        "conflictingRefs",
+        "severity",
+        "explanation",
+        "repairOptions"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "actionCandidateId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "riskKind": {
+          "$ref": "#/$defs/Text"
+        },
+        "conflictingRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "severity": {
+          "enum": ["low", "medium", "high"]
+        },
+        "explanation": {
+          "$ref": "#/$defs/Text"
+        },
+        "repairOptions": {
+          "$ref": "#/$defs/TextList"
+        }
+      }
+    },
+    "SimulationContext": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "workId",
+            "taskRef",
+            "sceneOrSegmentRef",
+            "characterRefs",
+            "stableProfileRefs",
+            "dynamicStateRefs",
+            "relationshipRefs",
+            "constraints",
+            "question",
+            "candidateActions"
+          ],
+          "properties": {
+            "type": {
+              "const": "simulation-context"
+            },
+            "workId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "taskRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "sceneOrSegmentRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "characterRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "stableProfileRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "dynamicStateRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "relationshipRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "constraints": {
+              "$ref": "#/$defs/TextList"
+            },
+            "question": {
+              "$ref": "#/$defs/Text"
+            },
+            "candidateActions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ActionCandidate"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "SimulationResult": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "simulationContextId",
+            "candidateRefs",
+            "recommendedDirection",
+            "requiredUserDecisions",
+            "draftChangeSetRefs",
+            "outlineAdjustmentSuggestionIds"
+          ],
+          "properties": {
+            "type": {
+              "const": "simulation-result"
+            },
+            "simulationContextId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "candidateRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "recommendedDirection": {
+              "$ref": "#/$defs/Text"
+            },
+            "requiredUserDecisions": {
+              "$ref": "#/$defs/TextList"
+            },
+            "draftChangeSetRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "outlineAdjustmentSuggestionIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "OutlineAdjustmentSuggestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "simulationResultId",
+        "targetOutlineRef",
+        "currentConstraint",
+        "suggestedChange",
+        "rationale",
+        "riskIfNotAdjusted"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "simulationResultId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "targetOutlineRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "currentConstraint": {
+          "$ref": "#/$defs/Text"
+        },
+        "suggestedChange": {
+          "$ref": "#/$defs/Text"
+        },
+        "rationale": {
+          "$ref": "#/$defs/Text"
+        },
+        "riskIfNotAdjusted": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,448 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/character.schema.json",
+  "$ref": "#/$defs/CharacterStableProfile",
+  "$defs": {
+    "Text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "TextList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Text"
+      }
+    },
+    "Score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10
+    },
+    "CharacterStableProfile": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "workId",
+            "displayName",
+            "role",
+            "coreDrive",
+            "coreDriveEvidenceRefIds",
+            "fearOrWound",
+            "boundaries",
+            "boundaryEvidenceRefIds",
+            "competencies",
+            "values",
+            "voiceNotes",
+            "voiceEvidenceRefIds",
+            "actionFingerprints"
+          ],
+          "properties": {
+            "type": {
+              "const": "character-stable-profile"
+            },
+            "workId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "displayName": {
+              "$ref": "#/$defs/Text"
+            },
+            "role": {
+              "$ref": "#/$defs/Text"
+            },
+            "coreDrive": {
+              "$ref": "#/$defs/Text"
+            },
+            "coreDriveEvidenceRefIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "fearOrWound": {
+              "$ref": "#/$defs/Text"
+            },
+            "boundaries": {
+              "$ref": "#/$defs/TextList"
+            },
+            "boundaryEvidenceRefIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "competencies": {
+              "$ref": "#/$defs/TextList"
+            },
+            "values": {
+              "$ref": "#/$defs/TextList"
+            },
+            "voiceNotes": {
+              "$ref": "#/$defs/TextList"
+            },
+            "voiceEvidenceRefIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "actionFingerprints": {
+              "$ref": "#/$defs/TextList"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "CharacterDynamicState": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "characterId",
+            "scopeRef",
+            "timepoint",
+            "emotionalState",
+            "knowledgeState",
+            "resources",
+            "constraints",
+            "evidenceRefIds"
+          ],
+          "properties": {
+            "type": {
+              "const": "character-dynamic-state"
+            },
+            "characterId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "scopeRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "timepoint": {
+              "$ref": "#/$defs/Text"
+            },
+            "emotionalState": {
+              "$ref": "#/$defs/Text"
+            },
+            "knowledgeState": {
+              "$ref": "#/$defs/TextList"
+            },
+            "resources": {
+              "$ref": "#/$defs/TextList"
+            },
+            "constraints": {
+              "$ref": "#/$defs/TextList"
+            },
+            "evidenceRefIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "CharacterArc": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "characterId",
+            "arcGoal",
+            "arcGoalEvidenceRefIds",
+            "startingBelief",
+            "pressurePattern",
+            "turningPoints",
+            "currentStage"
+          ],
+          "properties": {
+            "type": {
+              "const": "character-arc"
+            },
+            "characterId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "arcGoal": {
+              "$ref": "#/$defs/Text"
+            },
+            "arcGoalEvidenceRefIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "startingBelief": {
+              "$ref": "#/$defs/Text"
+            },
+            "pressurePattern": {
+              "$ref": "#/$defs/Text"
+            },
+            "turningPoints": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "currentStage": {
+              "$ref": "#/$defs/Text"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "CharacterTimelineEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timepoint", "eventRef", "stateDelta"],
+      "properties": {
+        "timepoint": {
+          "$ref": "#/$defs/Text"
+        },
+        "eventRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "stateDelta": {
+          "$ref": "#/$defs/Text"
+        },
+        "evidenceRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "changeSetRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        }
+      }
+    },
+    "CharacterTimeline": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["characterId", "entries", "lastVerifiedAt"],
+          "properties": {
+            "type": {
+              "const": "character-timeline"
+            },
+            "characterId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CharacterTimelineEntry"
+              }
+            },
+            "lastVerifiedAt": {
+              "$ref": "common.schema.json#/$defs/IsoDateTime"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "RelationshipEdge": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "workId",
+            "participantIds",
+            "relationshipKind",
+            "currentTemperature",
+            "trust",
+            "tension",
+            "publicStatus",
+            "privateStatus",
+            "evidenceRefIds"
+          ],
+          "properties": {
+            "type": {
+              "const": "relationship-edge"
+            },
+            "workId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "participantIds": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "relationshipKind": {
+              "$ref": "#/$defs/Text"
+            },
+            "currentTemperature": {
+              "enum": ["cold", "cool", "neutral", "warm", "hot"]
+            },
+            "trust": {
+              "$ref": "#/$defs/Score"
+            },
+            "tension": {
+              "$ref": "#/$defs/Score"
+            },
+            "publicStatus": {
+              "$ref": "#/$defs/Text"
+            },
+            "privateStatus": {
+              "$ref": "#/$defs/Text"
+            },
+            "evidenceRefIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "RelationshipTemperature": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["relationshipEdgeId", "scopeRef", "affinity", "conflict", "dependency", "recentTriggers"],
+          "properties": {
+            "type": {
+              "const": "relationship-temperature"
+            },
+            "relationshipEdgeId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "scopeRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "affinity": {
+              "$ref": "#/$defs/Score"
+            },
+            "conflict": {
+              "$ref": "#/$defs/Score"
+            },
+            "dependency": {
+              "$ref": "#/$defs/Score"
+            },
+            "recentTriggers": {
+              "$ref": "#/$defs/TextList"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "FocusRelationshipView": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "relationshipEdgeId",
+            "taskType",
+            "includedStateRefs",
+            "excludedStateRefs",
+            "activationReason"
+          ],
+          "properties": {
+            "type": {
+              "const": "focus-relationship-view"
+            },
+            "relationshipEdgeId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "taskType": {
+              "$ref": "#/$defs/Text"
+            },
+            "includedStateRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "excludedStateRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "activationReason": {
+              "$ref": "#/$defs/Text"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "InteractionPattern": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "participantRolePattern",
+            "trigger",
+            "typicalResponse",
+            "variationRules",
+            "riskNotes"
+          ],
+          "properties": {
+            "type": {
+              "const": "interaction-pattern"
+            },
+            "participantRolePattern": {
+              "$ref": "#/$defs/Text"
+            },
+            "trigger": {
+              "$ref": "#/$defs/Text"
+            },
+            "typicalResponse": {
+              "$ref": "#/$defs/Text"
+            },
+            "variationRules": {
+              "$ref": "#/$defs/TextList"
+            },
+            "riskNotes": {
+              "$ref": "#/$defs/TextList"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

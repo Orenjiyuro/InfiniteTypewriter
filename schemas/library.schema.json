@@ -106,6 +106,177 @@
         }
       }
     },
+    "CatalogRecordBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "title", "createdAt", "updatedAt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "ReferenceBookRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "title", "sourceId", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "reference-book" },
+        "title": { "type": "string", "minLength": 1 },
+        "sourceId": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "BreakdownProjectRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "title", "sourceId", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "breakdown-project" },
+        "title": { "type": "string", "minLength": 1 },
+        "sourceId": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "ProviderRunRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "providerJobRef", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "provider-run" },
+        "providerJobRef": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "DraftRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "targetRef", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "draft" },
+        "targetRef": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "RevisionRequestRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "targetRef", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "revision-request" },
+        "targetRef": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "ChangeSetRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "targetRef", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "change-set" },
+        "targetRef": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "TransferableAssetRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "mechanismRef", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "transferable-asset" },
+        "mechanismRef": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "CraftReferenceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "title", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "const": "craft-reference" },
+        "title": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "BackupRestoreStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["userConfirmationRequired", "status"],
+      "properties": {
+        "lastDryRunAt": { "$ref": "#/$defs/IsoDateTime" },
+        "lastBackupAt": { "$ref": "#/$defs/IsoDateTime" },
+        "lastRestoreDryRunAt": { "$ref": "#/$defs/IsoDateTime" },
+        "userConfirmationRequired": { "type": "boolean" },
+        "status": {
+          "enum": ["not-run", "dry-run-ready", "confirmed", "blocked", "applied"]
+        }
+      }
+    },
+    "MigrationStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "currentSchemaVersion",
+        "pendingMigration",
+        "userConfirmationRequired",
+        "blockedReasons"
+      ],
+      "properties": {
+        "currentSchemaVersion": { "type": "integer", "minimum": 1 },
+        "pendingMigration": { "type": "boolean" },
+        "lastDryRunAt": { "$ref": "#/$defs/IsoDateTime" },
+        "userConfirmationRequired": { "type": "boolean" },
+        "blockedReasons": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "LibraryExportPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "includeAiTaskAuditRecordsByDefault",
+        "exportProviderSecrets",
+        "providerConfigExportMode"
+      ],
+      "properties": {
+        "includeAiTaskAuditRecordsByDefault": { "const": false },
+        "exportProviderSecrets": { "const": false },
+        "providerConfigExportMode": { "enum": ["summary-only", "none"] }
+      }
+    },
     "LibraryManifest": {
       "type": "object",
       "additionalProperties": false,
@@ -114,13 +285,25 @@
         "root",
         "createdAt",
         "updatedAt",
+        "lastWriterVersion",
         "sources",
         "works",
-        "analyses"
+        "analyses",
+        "referenceBooks",
+        "breakdownProjects",
+        "providerRuns",
+        "drafts",
+        "revisionRequests",
+        "changeSets",
+        "transferableAssets",
+        "craftReferences",
+        "backupRestoreStatus",
+        "migrationStatus",
+        "exportPolicy"
       ],
       "properties": {
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "root": {
           "$ref": "#/$defs/LibraryRoot"
@@ -130,6 +313,10 @@
         },
         "updatedAt": {
           "$ref": "#/$defs/IsoDateTime"
+        },
+        "lastWriterVersion": {
+          "type": "string",
+          "minLength": 1
         },
         "sources": {
           "type": "array",
@@ -148,6 +335,47 @@
           "items": {
             "$ref": "#/$defs/AnalysisRecord"
           }
+        },
+        "referenceBooks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ReferenceBookRecord" }
+        },
+        "breakdownProjects": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BreakdownProjectRecord" }
+        },
+        "providerRuns": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProviderRunRecord" }
+        },
+        "drafts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DraftRecord" }
+        },
+        "revisionRequests": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RevisionRequestRecord" }
+        },
+        "changeSets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ChangeSetRecord" }
+        },
+        "transferableAssets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TransferableAssetRecord" }
+        },
+        "craftReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/CraftReferenceRecord" }
+        },
+        "backupRestoreStatus": {
+          "$ref": "#/$defs/BackupRestoreStatus"
+        },
+        "migrationStatus": {
+          "$ref": "#/$defs/MigrationStatus"
+        },
+        "exportPolicy": {
+          "$ref": "#/$defs/LibraryExportPolicy"
         }
       }
     }

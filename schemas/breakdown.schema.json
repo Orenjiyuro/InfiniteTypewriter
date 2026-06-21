@@ -1,0 +1,527 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/breakdown.schema.json",
+  "$ref": "#/$defs/BreakdownRecipe",
+  "$defs": {
+    "Text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "TextList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Text"
+      }
+    },
+    "ConcernKind": {
+      "enum": [
+        "outline",
+        "character",
+        "scene",
+        "setting",
+        "worldbuilding",
+        "pov",
+        "reader-contract",
+        "style",
+        "craft",
+        "relationship",
+        "foreshadowing",
+        "revision",
+        "custom"
+      ]
+    },
+    "CoverageClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "unavailableScope", "evidenceRefIds", "confidence", "rationale"],
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/Text"
+        },
+        "unavailableScope": {
+          "$ref": "#/$defs/TextList"
+        },
+        "evidenceRefIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "confidence": {
+          "enum": ["low", "medium", "high"]
+        },
+        "rationale": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "FieldEvidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fieldPath", "evidenceRefIds", "required"],
+      "properties": {
+        "fieldPath": {
+          "$ref": "#/$defs/Text"
+        },
+        "evidenceRefIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ObservationKind": {
+      "enum": ["observation", "inference", "assumption"]
+    },
+    "TransferRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sourceFact",
+        "transferableMechanism",
+        "targetVariableSlots",
+        "prohibitedResidue",
+        "misuseRisks"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sourceFact": {
+          "$ref": "#/$defs/Text"
+        },
+        "transferableMechanism": {
+          "$ref": "#/$defs/Text"
+        },
+        "targetVariableSlots": {
+          "$ref": "#/$defs/TextList"
+        },
+        "prohibitedResidue": {
+          "$ref": "#/$defs/TextList"
+        },
+        "misuseRisks": {
+          "$ref": "#/$defs/TextList"
+        }
+      }
+    },
+    "EvidenceCard": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "breakdownProjectId",
+            "breakdownScopeId",
+            "sourceLocator",
+            "observationKind",
+            "observedTechnique",
+            "functionInSource",
+            "transferableMechanism",
+            "prohibitedCopying",
+            "coverage",
+            "confidence",
+            "fieldEvidenceRefs"
+          ],
+          "properties": {
+            "type": {
+              "const": "evidence-card"
+            },
+            "breakdownProjectId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "breakdownScopeId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "sourceLocator": {
+              "$ref": "#/$defs/Text"
+            },
+            "observationKind": {
+              "$ref": "#/$defs/ObservationKind"
+            },
+            "observedTechnique": {
+              "$ref": "#/$defs/Text"
+            },
+            "functionInSource": {
+              "$ref": "#/$defs/Text"
+            },
+            "transferableMechanism": {
+              "$ref": "#/$defs/Text"
+            },
+            "prohibitedCopying": {
+              "$ref": "#/$defs/TextList"
+            },
+            "coverage": {
+              "$ref": "#/$defs/CoverageClaim"
+            },
+            "confidence": {
+              "enum": ["low", "medium", "high"]
+            },
+            "fieldEvidenceRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/FieldEvidenceRef"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ReferenceMechanism": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "sourceEvidenceRefs",
+            "mechanism",
+            "transferRuleIds",
+            "variableSlots",
+            "prohibitedResidue",
+            "misuseRisks",
+            "applicableTaskTypes",
+            "applicableScope",
+            "currentWorkConflictChecks"
+          ],
+          "properties": {
+            "type": {
+              "const": "reference-mechanism"
+            },
+            "sourceEvidenceRefs": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "mechanism": {
+              "$ref": "#/$defs/Text"
+            },
+            "transferRuleIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "variableSlots": {
+              "$ref": "#/$defs/TextList"
+            },
+            "prohibitedResidue": {
+              "$ref": "#/$defs/TextList"
+            },
+            "misuseRisks": {
+              "$ref": "#/$defs/TextList"
+            },
+            "applicableTaskTypes": {
+              "type": "array",
+              "items": {
+                "$ref": "context-pack.schema.json#/$defs/ContextTaskType"
+              }
+            },
+            "applicableScope": {
+              "$ref": "#/$defs/Text"
+            },
+            "currentWorkConflictChecks": {
+              "$ref": "#/$defs/TextList"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "BreakdownConcern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "label",
+        "requiredForRecipe",
+        "coverage",
+        "fieldEvidenceRefs",
+        "transferRuleIds"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "kind": {
+          "$ref": "#/$defs/ConcernKind"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "requiredForRecipe": {
+          "type": "boolean"
+        },
+        "coverage": {
+          "$ref": "#/$defs/CoverageClaim"
+        },
+        "fieldEvidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FieldEvidenceRef"
+          }
+        },
+        "transferRuleIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        }
+      }
+    },
+    "BookSpecificModuleField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "valueKind", "evidenceRequired", "displayHint", "migrationStrategy"],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "valueKind": {
+          "enum": ["text", "number", "boolean", "string-list", "record-list"]
+        },
+        "evidenceRequired": {
+          "type": "boolean"
+        },
+        "displayHint": {
+          "enum": ["card", "table", "timeline", "graph", "hidden"]
+        },
+        "migrationStrategy": {
+          "enum": ["preserve", "drop-if-unknown", "manual-review"]
+        }
+      }
+    },
+    "BookSpecificModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "appliesToConcernIds", "fields"],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "appliesToConcernIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BookSpecificModuleField"
+          }
+        }
+      }
+    },
+    "ViewProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "targetConcernId", "sourceFieldPaths", "displayKind"],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "targetConcernId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sourceFieldPaths": {
+          "$ref": "#/$defs/TextList"
+        },
+        "displayKind": {
+          "enum": ["card", "table", "timeline", "graph"]
+        }
+      }
+    },
+    "CompletionGateCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "targetRef",
+        "gateLevel",
+        "checkKind",
+        "blocking",
+        "passed",
+        "evidenceRefIds",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "targetRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "gateLevel": {
+          "enum": ["setup", "stage", "volume", "book"]
+        },
+        "checkKind": {
+          "$ref": "#/$defs/Text"
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "evidenceRefIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "notes": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "BreakdownRecipe": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "concerns",
+            "transferRules",
+            "modules",
+            "viewProjections",
+            "completionGateChecks"
+          ],
+          "properties": {
+            "type": {
+              "const": "breakdown-recipe"
+            },
+            "concerns": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/BreakdownConcern"
+              }
+            },
+            "transferRules": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/TransferRule"
+              }
+            },
+            "modules": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/BookSpecificModule"
+              }
+            },
+            "viewProjections": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ViewProjection"
+              }
+            },
+            "completionGateChecks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CompletionGateCheck"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "BreakdownProject": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["sourceId", "objective", "scopeIds", "outputRefIds"],
+          "properties": {
+            "type": {
+              "const": "breakdown-project"
+            },
+            "sourceId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "recipeId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "manualMethod": {
+              "$ref": "#/$defs/Text"
+            },
+            "objective": {
+              "$ref": "#/$defs/Text"
+            },
+            "scopeIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "outputRefIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "BreakdownScope": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["breakdownProjectId", "scopeLabel", "locator", "coverageIntent", "exclusions"],
+          "properties": {
+            "type": {
+              "const": "breakdown-scope"
+            },
+            "breakdownProjectId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "scopeLabel": {
+              "$ref": "#/$defs/Text"
+            },
+            "locator": {
+              "$ref": "#/$defs/Text"
+            },
+            "coverageIntent": {
+              "$ref": "#/$defs/Text"
+            },
+            "exclusions": {
+              "$ref": "#/$defs/TextList"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

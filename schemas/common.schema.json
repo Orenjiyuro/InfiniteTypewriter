@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/common.schema.json",
+  "$defs": {
+    "IsoDateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "StableId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "StableIdList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/StableId"
+      }
+    },
+    "ObjectStatus": {
+      "enum": ["draft", "active", "archived", "deprecated"]
+    },
+    "MetadataValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "Metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/MetadataValue"
+      }
+    },
+    "AuditTrailEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "action", "actor", "reason", "sourceRefIds"],
+      "properties": {
+        "at": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "action": {
+          "enum": ["create", "update", "confirm", "reject", "archive", "migrate"]
+        },
+        "actor": {
+          "enum": ["user", "system", "provider"]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRefIds": {
+          "$ref": "#/$defs/StableIdList"
+        }
+      }
+    },
+    "ContextHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "activationKeywords": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "priority": {
+          "enum": ["low", "normal", "high"]
+        },
+        "exclusionReason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "budgetHint": {
+          "enum": ["minimal", "standard", "full"]
+        }
+      }
+    },
+    "BaseObject": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "id",
+        "type",
+        "label",
+        "createdAt",
+        "updatedAt",
+        "status",
+        "tags",
+        "metadata",
+        "auditTrail"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "#/$defs/StableId"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "status": {
+          "$ref": "#/$defs/ObjectStatus"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/Metadata"
+        },
+        "auditTrail": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AuditTrailEntry"
+          }
+        },
+        "contextHints": {
+          "$ref": "#/$defs/ContextHints"
+        }
+      }
+    },
+    "BaseObjectV2": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "id",
+        "type",
+        "label",
+        "createdAt",
+        "updatedAt",
+        "status",
+        "tags",
+        "metadata",
+        "auditTrail"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 2
+        },
+        "id": {
+          "$ref": "#/$defs/StableId"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/IsoDateTime"
+        },
+        "status": {
+          "$ref": "#/$defs/ObjectStatus"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/Metadata"
+        },
+        "auditTrail": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AuditTrailEntry"
+          }
+        },
+        "contextHints": {
+          "$ref": "#/$defs/ContextHints"
+        }
+      }
+    }
+  }
+}

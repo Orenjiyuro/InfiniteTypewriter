@@ -34,3 +34,20 @@ runs/
 ai/jobs/
 *.stdout
 *.stderr
+
+# Local review/assistant artifacts
+CLAUDE.md
+docs/design-review-*.md
+docs/corpus-rebreakdown-structure.md
+.reasonix/
+docs/overview-handoff-*.md
+docs/project-overview-for-external-review.md
+docs/code-audit-*.md
+docs/architecture/*-review-*.md
+docs/architecture/*-preflight.md
+docs/architecture/schema-source-of-truth.md
+docs/methodology/whole-book-breakdown-methodology.md
+docs/research/
+docs/superpowers/
+docs/product/
+docs/维度框架.md

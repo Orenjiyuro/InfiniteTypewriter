@@ -1,0 +1,711 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/provider-job.schema.json",
+  "$ref": "#/$defs/ProviderJob",
+  "$defs": {
+    "Text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "HashValue": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "ProviderKind": {
+      "enum": [
+        "api-openai-compatible",
+        "api-anthropic",
+        "api-gemini",
+        "api-ollama",
+        "cli-codex",
+        "cli-claude-code",
+        "fake-test"
+      ]
+    },
+    "ProviderAuthMode": {
+      "enum": ["none", "env-var", "keychain-ref", "manual-session", "local-service"]
+    },
+    "ProviderCapabilityKind": {
+      "enum": [
+        "text-generation",
+        "structured-output",
+        "streaming",
+        "tool-use",
+        "local-cli-agent",
+        "local-model",
+        "usage-reporting",
+        "cancellation",
+        "permission-gate"
+      ]
+    },
+    "ProviderSupportLevel": {
+      "enum": ["native", "emulated", "unverified", "unsupported"]
+    },
+    "ProviderJobStatus": {
+      "enum": [
+        "queued",
+        "building-context",
+        "ready-for-provider",
+        "running",
+        "awaiting-approval",
+        "succeeded",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "ProviderJobEventType": {
+      "enum": [
+        "job-created",
+        "context-attached",
+        "prompt-built",
+        "provider-request-built",
+        "cli-command-built",
+        "provider-started",
+        "stdout-chunk",
+        "stderr-chunk",
+        "stream-chunk",
+        "approval-requested",
+        "approval-resolved",
+        "provider-finished",
+        "draft-created",
+        "usage-recorded",
+        "error-recorded",
+        "cancel-requested",
+        "cancelled",
+        "timeout"
+      ]
+    },
+    "ProviderActor": {
+      "enum": ["user", "system", "provider", "cli-process"]
+    },
+    "ProviderEventSeverity": {
+      "enum": ["info", "warning", "error"]
+    },
+    "ProviderErrorClass": {
+      "enum": [
+        "auth-error",
+        "permission-error",
+        "rate-limit",
+        "quota-or-billing",
+        "request-invalid",
+        "context-too-large",
+        "budget-blocked",
+        "provider-timeout",
+        "provider-overloaded",
+        "provider-internal",
+        "network-error",
+        "schema-output-invalid",
+        "safety-blocked",
+        "local-service-unavailable",
+        "model-not-found",
+        "secret-unresolved",
+        "advanced-agent-mode-disabled"
+      ]
+    },
+    "ContextTaskType": {
+      "enum": [
+        "source-breakdown",
+        "creative-discussion",
+        "outline-generation",
+        "character-simulation",
+        "scene-planning",
+        "draft-generation",
+        "style-revision",
+        "continuity-audit",
+        "writeback-suggestion"
+      ]
+    },
+    "ProviderOutputMode": {
+      "enum": ["structured-draft", "freeform-draft", "non-writeback-summary"]
+    },
+    "ManifestHashEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "hash"],
+      "properties": {
+        "ref": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "hash": {
+          "$ref": "#/$defs/HashValue"
+        }
+      }
+    },
+    "SchemaVersionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaId", "version"],
+      "properties": {
+        "schemaId": {
+          "$ref": "#/$defs/Text"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "ContextHash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "schemaVersionMap",
+        "libraryManifestHash",
+        "sourceHashRefs",
+        "changeSetRefs",
+        "changeSetHash",
+        "selectionPolicyVersion",
+        "includedItemHashes",
+        "activationHashes",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "enum": ["sha256"]
+        },
+        "canonicalization": {
+          "enum": ["json-canonical-v1"]
+        },
+        "schemaVersionMap": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SchemaVersionEntry"
+          }
+        },
+        "libraryManifestHash": {
+          "$ref": "#/$defs/HashValue"
+        },
+        "sourceHashRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "changeSetRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        },
+        "changeSetHash": {
+          "$ref": "#/$defs/HashValue"
+        },
+        "selectionPolicyVersion": {
+          "$ref": "#/$defs/Text"
+        },
+        "promptTemplateVersion": {
+          "$ref": "#/$defs/Text"
+        },
+        "includedItemHashes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "activationHashes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "excludedItemHashes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "value": {
+          "$ref": "#/$defs/HashValue"
+        }
+      }
+    },
+    "ProviderPermissionSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowLongTermWrite",
+        "allowFilesystemWrite",
+        "allowShell",
+        "allowNetwork",
+        "allowTools",
+        "requiresUserApproval"
+      ],
+      "properties": {
+        "allowLongTermWrite": {
+          "type": "boolean"
+        },
+        "allowFilesystemWrite": {
+          "type": "boolean"
+        },
+        "allowShell": {
+          "type": "boolean"
+        },
+        "allowNetwork": {
+          "type": "boolean"
+        },
+        "allowTools": {
+          "type": "boolean"
+        },
+        "requiresUserApproval": {
+          "type": "boolean"
+        },
+        "cliPermissionMode": {
+          "$ref": "#/$defs/Text"
+        },
+        "workingDirectory": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "ProviderUsage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerKind",
+        "model",
+        "durationMs",
+        "usageRecordedAt",
+        "isBillable"
+      ],
+      "properties": {
+        "providerKind": {
+          "$ref": "#/$defs/ProviderKind"
+        },
+        "model": {
+          "$ref": "#/$defs/Text"
+        },
+        "inputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cachedInputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reasoningTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "providerUsageRawSummary": {
+          "$ref": "#/$defs/Text"
+        },
+        "localPromptEvalCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "localEvalCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requestId": {
+          "$ref": "#/$defs/Text"
+        },
+        "usageUnavailableReason": {
+          "$ref": "#/$defs/Text"
+        },
+        "usageRecordedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "isBillable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ProviderError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["errorClass", "message", "retryable", "redactionPolicyVersion"],
+      "properties": {
+        "errorClass": {
+          "$ref": "#/$defs/ProviderErrorClass"
+        },
+        "message": {
+          "$ref": "#/$defs/Text"
+        },
+        "providerStatusCode": {
+          "type": "integer",
+          "minimum": 100
+        },
+        "providerRequestId": {
+          "$ref": "#/$defs/Text"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "redactionPolicyVersion": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "ProviderCancellation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested", "gracefulTerminationAttempted"],
+      "properties": {
+        "requested": {
+          "type": "boolean"
+        },
+        "requestedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "requestedBy": {
+          "enum": ["user", "system"]
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        },
+        "gracefulTerminationAttempted": {
+          "type": "boolean"
+        },
+        "finalSignal": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "ProviderJobEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "jobId",
+        "sequence",
+        "eventType",
+        "at",
+        "actor",
+        "summary",
+        "rawPayloadRetained",
+        "severity"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "jobId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "eventType": {
+          "$ref": "#/$defs/ProviderJobEventType"
+        },
+        "at": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "actor": {
+          "$ref": "#/$defs/ProviderActor"
+        },
+        "statusBefore": {
+          "$ref": "#/$defs/ProviderJobStatus"
+        },
+        "statusAfter": {
+          "$ref": "#/$defs/ProviderJobStatus"
+        },
+        "summary": {
+          "$ref": "#/$defs/Text"
+        },
+        "redactedPayloadRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "rawPayloadRetained": {
+          "type": "boolean"
+        },
+        "severity": {
+          "$ref": "#/$defs/ProviderEventSeverity"
+        },
+        "errorClass": {
+          "$ref": "#/$defs/ProviderErrorClass"
+        }
+      }
+    },
+    "ProviderCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "providerConfigId",
+        "capabilityKind",
+        "supported",
+        "supportLevel",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "providerConfigId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "capabilityKind": {
+          "$ref": "#/$defs/ProviderCapabilityKind"
+        },
+        "supported": {
+          "type": "boolean"
+        },
+        "supportLevel": {
+          "$ref": "#/$defs/ProviderSupportLevel"
+        },
+        "notes": {
+          "$ref": "#/$defs/Text"
+        },
+        "verifiedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "ProviderConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "type",
+        "label",
+        "createdAt",
+        "updatedAt",
+        "status",
+        "tags",
+        "metadata",
+        "auditTrail",
+        "providerKind",
+        "enabled",
+        "authMode",
+        "defaultModel",
+        "defaultTimeoutMs",
+        "capabilityRefs",
+        "redactionPolicyVersion",
+        "advancedAgentModeEnabled",
+        "failClosedDefaults"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "type": {
+          "const": "provider-config"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "status": {
+          "$ref": "common.schema.json#/$defs/ObjectStatus"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
+        },
+        "metadata": {
+          "$ref": "common.schema.json#/$defs/Metadata"
+        },
+        "auditTrail": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/AuditTrailEntry"
+          }
+        },
+        "providerKind": {
+          "$ref": "#/$defs/ProviderKind"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "authMode": {
+          "$ref": "#/$defs/ProviderAuthMode"
+        },
+        "secretRef": {
+          "$ref": "#/$defs/Text"
+        },
+        "baseUrl": {
+          "$ref": "#/$defs/Text"
+        },
+        "defaultModel": {
+          "$ref": "#/$defs/Text"
+        },
+        "defaultTimeoutMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "capabilityRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        },
+        "redactionPolicyVersion": {
+          "$ref": "#/$defs/Text"
+        },
+        "advancedAgentModeEnabled": {
+          "type": "boolean"
+        },
+        "failClosedDefaults": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ProviderJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "type",
+        "label",
+        "createdAt",
+        "updatedAt",
+        "status",
+        "tags",
+        "metadata",
+        "auditTrail",
+        "taskType",
+        "targetRef",
+        "contextPackRef",
+        "contextHash",
+        "libraryManifestHash",
+        "providerConfigRef",
+        "providerKind",
+        "model",
+        "promptTemplateVersion",
+        "outputSchemaRef",
+        "outputSchemaVersion",
+        "permissions",
+        "createdBy",
+        "timeoutMs",
+        "cancellation",
+        "inputSummary",
+        "eventRefs"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "type": {
+          "const": "provider-job"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "status": {
+          "$ref": "#/$defs/ProviderJobStatus"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
+        },
+        "metadata": {
+          "$ref": "common.schema.json#/$defs/Metadata"
+        },
+        "auditTrail": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/AuditTrailEntry"
+          }
+        },
+        "taskType": {
+          "$ref": "#/$defs/ContextTaskType"
+        },
+        "targetRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "contextPackRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "contextHash": {
+          "$ref": "#/$defs/ContextHash"
+        },
+        "libraryManifestHash": {
+          "$ref": "#/$defs/HashValue"
+        },
+        "providerConfigRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "providerKind": {
+          "$ref": "#/$defs/ProviderKind"
+        },
+        "model": {
+          "$ref": "#/$defs/Text"
+        },
+        "promptTemplateVersion": {
+          "$ref": "#/$defs/Text"
+        },
+        "outputSchemaRef": {
+          "$ref": "#/$defs/Text"
+        },
+        "outputSchemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "outputMode": {
+          "$ref": "#/$defs/ProviderOutputMode"
+        },
+        "permissions": {
+          "$ref": "#/$defs/ProviderPermissionSet"
+        },
+        "createdBy": {
+          "enum": ["user", "system"]
+        },
+        "startedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "endedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cancellation": {
+          "$ref": "#/$defs/ProviderCancellation"
+        },
+        "inputSummary": {
+          "$ref": "#/$defs/Text"
+        },
+        "outputSummary": {
+          "$ref": "#/$defs/Text"
+        },
+        "draftOutputRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "usage": {
+          "$ref": "#/$defs/ProviderUsage"
+        },
+        "error": {
+          "$ref": "#/$defs/ProviderError"
+        },
+        "eventRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        }
+      }
+    }
+  }
+}

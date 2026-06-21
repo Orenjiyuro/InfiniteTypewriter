@@ -112,6 +112,27 @@ fn content_hashes_are_stable_for_same_relative_path_and_bytes() {
 }
 
 #[test]
+fn content_hashes_include_chunk_boundaries_between_path_and_file_bytes() {
+    let root = unique_temp_path("hash-boundary");
+    fs::create_dir_all(&root).expect("fixture directory should be created");
+    fs::write(root.join("a"), "bc").expect("first file should be written");
+    fs::write(root.join("ab"), "c").expect("second file should be written");
+
+    let dry_run = dry_run_private_corpus_migration(
+        MigrationSource::new(root.to_string_lossy()),
+        MigrationTarget::new("C:/Users/demo/InfiniteTypewriter"),
+        "2026-06-05T00:00:00.000Z",
+    )
+    .expect("fixture should scan");
+
+    assert_eq!(dry_run.items[0].relative_path, "a");
+    assert_eq!(dry_run.items[1].relative_path, "ab");
+    assert_ne!(dry_run.items[0].content_hash, dry_run.items[1].content_hash);
+
+    fs::remove_dir_all(root).expect("fixture directory should clean up");
+}
+
+#[test]
 fn target_paths_preserve_relative_directories_to_avoid_collisions() {
     let root = unique_temp_path("target-paths");
     fs::create_dir_all(root.join("first")).expect("first directory should be created");
@@ -193,6 +214,136 @@ fn overlapping_include_paths_do_not_duplicate_source_items() {
 
     assert_eq!(dry_run.items.len(), 1);
     assert_eq!(dry_run.items[0].relative_path, "notes/mechanism.md");
+
+    fs::remove_dir_all(root).expect("fixture directory should clean up");
+}
+
+#[cfg(unix)]
+#[test]
+fn symlink_items_are_blocked_instead_of_migrated() {
+    use std::os::unix::fs::symlink;
+
+    let root = unique_temp_path("symlink");
+    fs::create_dir_all(&root).expect("fixture directory should be created");
+    fs::write(root.join("real.md"), "Toy mechanism note.\n")
+        .expect("real fixture file should be written");
+    symlink(root.join("real.md"), root.join("linked.md")).expect("symlink should be created");
+
+    let dry_run = dry_run_private_corpus_migration(
+        MigrationSource::new(root.to_string_lossy()),
+        MigrationTarget::new("C:/Users/demo/InfiniteTypewriter"),
+        "2026-06-05T00:00:00.000Z",
+    )
+    .expect("fixture should scan");
+
+    let linked_item = dry_run
+        .items
+        .iter()
+        .find(|item| item.relative_path == "linked.md")
+        .expect("linked item should be reported");
+
+    assert_eq!(
+        linked_item.blocked_reason.as_deref(),
+        Some("symbolic links are not migrated")
+    );
+
+    fs::remove_dir_all(root).expect("fixture directory should clean up");
+}
+
+#[cfg(windows)]
+#[test]
+fn symlink_items_are_blocked_instead_of_migrated() {
+    use std::os::windows::fs::symlink_file;
+
+    let root = unique_temp_path("symlink");
+    fs::create_dir_all(&root).expect("fixture directory should be created");
+    fs::write(root.join("real.md"), "Toy mechanism note.\n")
+        .expect("real fixture file should be written");
+
+    if symlink_file(root.join("real.md"), root.join("linked.md")).is_err() {
+        fs::remove_dir_all(root).expect("fixture directory should clean up");
+        return;
+    }
+
+    let dry_run = dry_run_private_corpus_migration(
+        MigrationSource::new(root.to_string_lossy()),
+        MigrationTarget::new("C:/Users/demo/InfiniteTypewriter"),
+        "2026-06-05T00:00:00.000Z",
+    )
+    .expect("fixture should scan");
+
+    let linked_item = dry_run
+        .items
+        .iter()
+        .find(|item| item.relative_path == "linked.md")
+        .expect("linked item should be reported");
+
+    assert_eq!(
+        linked_item.blocked_reason.as_deref(),
+        Some("symbolic links are not migrated")
+    );
+
+    fs::remove_dir_all(root).expect("fixture directory should clean up");
+}
+
+#[cfg(unix)]
+#[test]
+fn explicitly_included_symlink_items_are_blocked_instead_of_followed() {
+    use std::os::unix::fs::symlink;
+
+    let root = unique_temp_path("include-symlink");
+    fs::create_dir_all(&root).expect("fixture directory should be created");
+    fs::write(root.join("real.md"), "Toy mechanism note.\n")
+        .expect("real fixture file should be written");
+    symlink(root.join("real.md"), root.join("linked.md")).expect("symlink should be created");
+
+    let source = MigrationSource::new(root.to_string_lossy()).with_include_paths(["linked.md"]);
+    let dry_run = dry_run_private_corpus_migration(
+        source,
+        MigrationTarget::new("C:/Users/demo/InfiniteTypewriter"),
+        "2026-06-05T00:00:00.000Z",
+    )
+    .expect("fixture should scan");
+
+    assert_eq!(dry_run.items.len(), 1);
+    assert_eq!(dry_run.items[0].relative_path, "linked.md");
+    assert_eq!(
+        dry_run.items[0].blocked_reason.as_deref(),
+        Some("symbolic links are not migrated")
+    );
+
+    fs::remove_dir_all(root).expect("fixture directory should clean up");
+}
+
+#[cfg(windows)]
+#[test]
+fn explicitly_included_symlink_items_are_blocked_instead_of_followed() {
+    use std::os::windows::fs::symlink_file;
+
+    let root = unique_temp_path("include-symlink");
+    fs::create_dir_all(&root).expect("fixture directory should be created");
+    fs::write(root.join("real.md"), "Toy mechanism note.\n")
+        .expect("real fixture file should be written");
+
+    if symlink_file(root.join("real.md"), root.join("linked.md")).is_err() {
+        fs::remove_dir_all(root).expect("fixture directory should clean up");
+        return;
+    }
+
+    let source = MigrationSource::new(root.to_string_lossy()).with_include_paths(["linked.md"]);
+    let dry_run = dry_run_private_corpus_migration(
+        source,
+        MigrationTarget::new("C:/Users/demo/InfiniteTypewriter"),
+        "2026-06-05T00:00:00.000Z",
+    )
+    .expect("fixture should scan");
+
+    assert_eq!(dry_run.items.len(), 1);
+    assert_eq!(dry_run.items[0].relative_path, "linked.md");
+    assert_eq!(
+        dry_run.items[0].blocked_reason.as_deref(),
+        Some("symbolic links are not migrated")
+    );
 
     fs::remove_dir_all(root).expect("fixture directory should clean up");
 }

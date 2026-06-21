@@ -27,9 +27,14 @@ mod tests {
             "2026-06-05T00:00:00.000Z".to_string(),
         );
 
-        assert_eq!(manifest.schema_version, 1);
+        assert_eq!(manifest.schema_version, 2);
         assert!(manifest.sources.is_empty());
         assert!(manifest.works.is_empty());
         assert!(manifest.analyses.is_empty());
+        assert!(manifest.revision_requests.is_empty());
+        assert!(manifest.change_sets.is_empty());
+        assert!(manifest.backup_restore_status.user_confirmation_required);
+        assert!(manifest.migration_status.user_confirmation_required);
+        assert!(!manifest.export_policy.export_provider_secrets);
     }
 }

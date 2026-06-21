@@ -82,6 +82,7 @@ pub struct MigrationItemTarget {
 pub enum MigrationTargetKind {
     Source,
     Analysis,
+    /// Reserved for later workspace import contracts; 9.3 dry-run does not infer Work targets.
     Work,
     Unsupported,
 }
@@ -168,6 +169,15 @@ pub fn dry_run_private_corpus_migration(
         for include_path in &source.include_paths {
             reject_unsafe_include_path(include_path)?;
             let selected_path = canonical_root.join(include_path);
+            let selected_metadata = fs::symlink_metadata(&selected_path)?;
+            if selected_metadata.file_type().is_symlink() {
+                items.push(blocked_item(
+                    &canonical_root,
+                    &selected_path,
+                    "symbolic links are not migrated",
+                )?);
+                continue;
+            }
             let canonical_selected = fs::canonicalize(&selected_path)?;
             ensure_inside_root(&canonical_root, &canonical_selected, include_path)?;
             scan_path(&canonical_root, &canonical_selected, &mut items)?;
@@ -367,6 +377,8 @@ fn stable_hash<'a>(chunks: impl IntoIterator<Item = &'a [u8]>) -> String {
             hash ^= u64::from(*byte);
             hash = hash.wrapping_mul(0x100000001b3);
         }
+        hash ^= 0xff;
+        hash = hash.wrapping_mul(0x100000001b3);
     }
     format!("fnv1a64:{hash:016x}")
 }

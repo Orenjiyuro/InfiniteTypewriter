@@ -1550,6 +1550,16 @@ dependencies = [
  "rusqlite",
  "serde",
  "serde_json",
+ "sha2",
+]
+
+[[package]]
+name = "infinite_typewriter_providers"
+version = "0.1.0"
+dependencies = [
+ "infinite_typewriter_core",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

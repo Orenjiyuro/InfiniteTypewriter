@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://infinite-typewriter.local/schemas/methodology.schema.json",
-  "$ref": "#/$defs/ContextPack",
+  "$ref": "#/$defs/MethodologySeedBundle",
   "$defs": {
     "IsoDateTime": {
       "type": "string",
@@ -270,7 +270,7 @@
         "affectedIds": { "$ref": "#/$defs/StringList" }
       }
     },
-    "ContextPack": {
+    "MethodologySeedBundle": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -290,7 +290,7 @@
       ],
       "properties": {
         "id": { "$ref": "#/$defs/NonEmptyString" },
-        "kind": { "const": "context-pack" },
+        "kind": { "const": "methodology-seed-bundle" },
         "createdAt": { "$ref": "#/$defs/IsoDateTime" },
         "updatedAt": { "$ref": "#/$defs/IsoDateTime" },
         "purpose": { "$ref": "#/$defs/NonEmptyString" },

@@ -96,6 +96,8 @@ export interface SceneCard {
   turn: string;
 }
 
+export type MethodologySceneCard = SceneCard;
+
 export interface DraftReviewItem {
   id: string;
   kind: "draft-review-item";
@@ -122,9 +124,9 @@ export interface ChangeSet {
   affectedIds: string[];
 }
 
-export interface ContextPack {
+export interface MethodologySeedBundle {
   id: string;
-  kind: "context-pack";
+  kind: "methodology-seed-bundle";
   createdAt: IsoDateTime;
   updatedAt: IsoDateTime;
   purpose: string;
@@ -208,7 +210,7 @@ function hasText(value: string | undefined): boolean {
   return typeof value === "string" && value.length > 0;
 }
 
-export function createToyContextPack(timestamp: IsoDateTime): ContextPack {
+export function createToyMethodologySeedBundle(timestamp: IsoDateTime): MethodologySeedBundle {
   const evidenceCard: EvidenceCard = {
     id: "evidence-toy-pressure",
     kind: "evidence-card",
@@ -245,8 +247,8 @@ export function createToyContextPack(timestamp: IsoDateTime): ContextPack {
   };
 
   return {
-    id: "context-pack-toy",
-    kind: "context-pack",
+    id: "methodology-seed-bundle-toy",
+    kind: "methodology-seed-bundle",
     createdAt: timestamp,
     updatedAt: timestamp,
     purpose: "Toy original planning context",

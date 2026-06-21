@@ -1,0 +1,750 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/story.schema.json",
+  "$ref": "#/$defs/Work",
+  "$defs": {
+    "Text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "TextList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Text"
+      }
+    },
+    "Work": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["workKind", "premise", "readerContractRefs", "outline"],
+          "properties": {
+            "type": {
+              "const": "work"
+            },
+            "workKind": {
+              "enum": ["novel", "series", "short", "other"]
+            },
+            "premise": {
+              "$ref": "#/$defs/Text"
+            },
+            "readerContractRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "outline": {
+              "$ref": "#/$defs/WorkOutline"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "WorkOutline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "workId", "volumes"],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "workId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VolumeOutline"
+          }
+        }
+      }
+    },
+    "VolumeOutline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "workId", "title", "sequence", "purpose", "segments"],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "workId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "title": {
+          "$ref": "#/$defs/Text"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "purpose": {
+          "$ref": "#/$defs/Text"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StorySegment"
+          }
+        }
+      }
+    },
+    "StorySegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "workId", "label", "sequence", "goal", "pressure", "chapters"],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "workId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "parentId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "goal": {
+          "$ref": "#/$defs/Text"
+        },
+        "pressure": {
+          "$ref": "#/$defs/Text"
+        },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChapterPlan"
+          }
+        }
+      }
+    },
+    "ChapterPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "workId", "sequence", "title", "chapterGoal", "sceneRefs"],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "workId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "$ref": "#/$defs/Text"
+        },
+        "chapterGoal": {
+          "$ref": "#/$defs/Text"
+        },
+        "sceneRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        }
+      }
+    },
+    "Beat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sceneId",
+        "sequence",
+        "beatKind",
+        "intent",
+        "expectedChange",
+        "characterRefs",
+        "evidenceRefIds"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sceneId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "beatKind": {
+          "enum": ["action", "dialogue", "reveal", "decision", "reversal", "transition", "other"]
+        },
+        "intent": {
+          "$ref": "#/$defs/Text"
+        },
+        "expectedChange": {
+          "$ref": "#/$defs/Text"
+        },
+        "characterRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "evidenceRefIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        }
+      }
+    },
+    "SceneCard": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "chapterId",
+            "sceneGoal",
+            "povMode",
+            "knowledgeBoundaryRef",
+            "entryState",
+            "exitState",
+            "characterStateRefs",
+            "relationshipRefs",
+            "foreshadowingRefs",
+            "styleTargetRefs",
+            "beats"
+          ],
+          "properties": {
+            "type": {
+              "const": "scene-card"
+            },
+            "chapterId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "sceneGoal": {
+              "$ref": "#/$defs/Text"
+            },
+            "povCharacterId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "povMode": {
+              "$ref": "#/$defs/Text"
+            },
+            "knowledgeBoundaryRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "settingPressureRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "settingPressureText": {
+              "$ref": "#/$defs/Text"
+            },
+            "entryState": {
+              "$ref": "#/$defs/Text"
+            },
+            "exitState": {
+              "$ref": "#/$defs/Text"
+            },
+            "characterStateRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "relationshipRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "foreshadowingRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "styleTargetRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "beats": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Beat"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ForeshadowingEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "ledgerId",
+        "signal",
+        "plantedAtRef",
+        "intendedPayoff",
+        "currentState",
+        "visibility",
+        "riskNotes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "ledgerId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "signal": {
+          "$ref": "#/$defs/Text"
+        },
+        "plantedAtRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "intendedPayoff": {
+          "$ref": "#/$defs/Text"
+        },
+        "currentState": {
+          "enum": ["planted", "partially-revealed", "resolved", "abandoned"]
+        },
+        "visibility": {
+          "enum": ["hidden", "subtle", "clear"]
+        },
+        "riskNotes": {
+          "$ref": "#/$defs/TextList"
+        }
+      }
+    },
+    "ForeshadowingLedger": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["workId", "entries", "lastReviewedAt"],
+          "properties": {
+            "type": {
+              "const": "foreshadowing-ledger"
+            },
+            "workId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ForeshadowingEntry"
+              }
+            },
+            "lastReviewedAt": {
+              "$ref": "common.schema.json#/$defs/IsoDateTime"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "DraftReviewItem": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "targetRef",
+            "sourceDraftRef",
+            "severity",
+            "category",
+            "finding",
+            "recommendation",
+            "evidenceRefIds"
+          ],
+          "properties": {
+            "type": {
+              "const": "draft-review-item"
+            },
+            "targetRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "sourceDraftRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "severity": {
+              "enum": ["low", "medium", "high"]
+            },
+            "category": {
+              "$ref": "#/$defs/Text"
+            },
+            "finding": {
+              "$ref": "#/$defs/Text"
+            },
+            "recommendation": {
+              "$ref": "#/$defs/Text"
+            },
+            "evidenceRefIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "blockedReason": {
+              "$ref": "#/$defs/Text"
+            },
+            "conflictRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "RevisionRequestStatus": {
+      "enum": ["draft", "ready-for-rerun", "rerun-created", "blocked", "closed"]
+    },
+    "RevisionRequest": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "targetRef",
+            "originalChunkRef",
+            "originalDraftRef",
+            "userFeedback",
+            "outputSchemaRef",
+            "outputSchemaVersion",
+            "contextHash",
+            "requestedRerunTaskType",
+            "requestStatus"
+          ],
+          "properties": {
+            "type": {
+              "const": "revision-request"
+            },
+            "targetRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "originalChunkRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "originalDraftRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "userFeedback": {
+              "$ref": "#/$defs/Text"
+            },
+            "outputSchemaRef": {
+              "$ref": "#/$defs/Text"
+            },
+            "outputSchemaVersion": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "contextHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "requestedRerunTaskType": {
+              "$ref": "context-pack.schema.json#/$defs/ContextTaskType"
+            },
+            "requestStatus": {
+              "$ref": "#/$defs/RevisionRequestStatus"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ChangeSetEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targetRef", "changeType", "description"],
+      "properties": {
+        "targetRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "changeType": {
+          "enum": ["create", "update", "remove"]
+        },
+        "description": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "ChangeSet": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "summary",
+            "reason",
+            "sourceDraftRef",
+            "revisionRequestRefs",
+            "targetRefs",
+            "changes",
+            "impactScope",
+            "confirmationState"
+          ],
+          "properties": {
+            "type": {
+              "const": "change-set"
+            },
+            "summary": {
+              "$ref": "#/$defs/Text"
+            },
+            "reason": {
+              "$ref": "#/$defs/Text"
+            },
+            "sourceDraftRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "revisionRequestRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "targetRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "changes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ChangeSetEntry"
+              }
+            },
+            "impactScope": {
+              "$ref": "#/$defs/TextList"
+            },
+            "confirmationState": {
+              "enum": ["pending-user-confirmation", "confirmed", "rejected"]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "RevisionSuggestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targetRef", "suggestedTextRef", "reason", "evidenceRefIds", "riskNotes"],
+      "properties": {
+        "targetRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "suggestedTextRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        },
+        "evidenceRefIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "riskNotes": {
+          "$ref": "#/$defs/TextList"
+        }
+      }
+    },
+    "ProseQualityPass": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["targetRef", "qualityGoals", "beforeRef", "suggestions", "decision"],
+          "properties": {
+            "type": {
+              "const": "prose-quality-pass"
+            },
+            "targetRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "qualityGoals": {
+              "$ref": "#/$defs/TextList"
+            },
+            "beforeRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "suggestions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RevisionSuggestion"
+              }
+            },
+            "decision": {
+              "enum": ["pending-user-review", "accepted", "rejected"]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "StyleRevisionPass": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "targetRef",
+            "styleProfileRefs",
+            "voiceConstraints",
+            "suggestions",
+            "decision"
+          ],
+          "properties": {
+            "type": {
+              "const": "style-revision-pass"
+            },
+            "targetRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "styleProfileRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "voiceConstraints": {
+              "$ref": "#/$defs/TextList"
+            },
+            "suggestions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/RevisionSuggestion"
+              }
+            },
+            "decision": {
+              "enum": ["pending-user-review", "accepted", "rejected"]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "RevisionLayer": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["targetRef", "layerKind", "objective", "reviewItemRefs"],
+          "properties": {
+            "type": {
+              "const": "revision-layer"
+            },
+            "targetRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "layerKind": {
+              "enum": ["structure", "character", "scene", "prose-style", "continuity"]
+            },
+            "objective": {
+              "$ref": "#/$defs/Text"
+            },
+            "reviewItemRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ContinuityIssue": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "targetRef",
+            "issueKind",
+            "description",
+            "relatedRefs",
+            "severity",
+            "proposedFix",
+            "confirmationState"
+          ],
+          "properties": {
+            "type": {
+              "const": "continuity-issue"
+            },
+            "targetRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "issueKind": {
+              "$ref": "#/$defs/Text"
+            },
+            "description": {
+              "$ref": "#/$defs/Text"
+            },
+            "relatedRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "severity": {
+              "enum": ["low", "medium", "high"]
+            },
+            "proposedFix": {
+              "$ref": "#/$defs/Text"
+            },
+            "confirmationState": {
+              "enum": ["draft", "accepted", "rejected"]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

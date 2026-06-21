@@ -1,17 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
-  createToyContextPack,
+  createToyMethodologySeedBundle,
   validateEvidenceCard,
   type EvidenceCard,
+  type MethodologySceneCard,
 } from "../src/domain/methodology";
 
 describe("methodology contracts", () => {
-  it("round-trips a public-safe ContextPack fixture", () => {
-    const contextPack = createToyContextPack("2026-06-05T00:00:00.000Z");
+  it("round-trips a public-safe methodology seed bundle fixture", () => {
+    const bundle = createToyMethodologySeedBundle("2026-06-05T00:00:00.000Z");
+    const scene: MethodologySceneCard = bundle.sceneCards[0];
 
-    const roundTripped = JSON.parse(JSON.stringify(contextPack));
+    const roundTripped = JSON.parse(JSON.stringify(bundle));
 
-    expect(roundTripped).toEqual(contextPack);
+    expect(roundTripped).toEqual(bundle);
+    expect(scene.kind).toBe("scene-card");
     expect(roundTripped.evidenceCards[0].source.title).toBe("Public Toy Source");
   });
 
@@ -34,7 +37,7 @@ describe("methodology contracts", () => {
   });
 
   it("rejects EvidenceCard values with empty or incomplete evidence fields", () => {
-    const [card] = createToyContextPack("2026-06-05T00:00:00.000Z").evidenceCards;
+    const [card] = createToyMethodologySeedBundle("2026-06-05T00:00:00.000Z").evidenceCards;
 
     expect(validateEvidenceCard({ ...card, evidence: [] })).toEqual({
       valid: false,

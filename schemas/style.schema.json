@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/style.schema.json",
+  "$ref": "#/$defs/StyleProfile",
+  "$defs": {
+    "Text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "TextList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Text"
+      }
+    },
+    "StyleProfile": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "ownerRef",
+            "scope",
+            "styleDimensions",
+            "voiceConstraints",
+            "doNotImitate",
+            "evidenceRefIds",
+            "transferRuleIds",
+            "misuseRisks",
+            "taskUseHints"
+          ],
+          "properties": {
+            "type": {
+              "const": "style-profile"
+            },
+            "ownerRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "scope": {
+              "$ref": "#/$defs/Text"
+            },
+            "styleDimensions": {
+              "$ref": "#/$defs/TextList"
+            },
+            "voiceConstraints": {
+              "$ref": "#/$defs/TextList"
+            },
+            "doNotImitate": {
+              "$ref": "#/$defs/TextList"
+            },
+            "evidenceRefIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "transferRuleIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "misuseRisks": {
+              "$ref": "#/$defs/TextList"
+            },
+            "taskUseHints": {
+              "$ref": "#/$defs/TextList"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "NarrativeDNA": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "type",
+        "label",
+        "createdAt",
+        "updatedAt",
+        "status",
+        "tags",
+        "metadata",
+        "auditTrail",
+        "workId",
+        "readerExperienceGoal",
+        "promiseProgressPayoffPattern",
+        "tensionEngine",
+        "sceneRhythm",
+        "signatureMoves",
+        "evidenceRefIds",
+        "coverage",
+        "confidence",
+        "mechanismRefIds",
+        "transferRuleRefs",
+        "applicableTaskTypes",
+        "applicableScope",
+        "misuseRisks",
+        "doNotCopy",
+        "prohibitedResidue",
+        "currentWorkConflictChecks"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 2
+        },
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "type": {
+          "const": "narrative-dna"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "status": {
+          "$ref": "common.schema.json#/$defs/ObjectStatus"
+        },
+        "tags": {
+          "$ref": "#/$defs/TextList"
+        },
+        "metadata": {
+          "$ref": "common.schema.json#/$defs/Metadata"
+        },
+        "auditTrail": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/AuditTrailEntry"
+          }
+        },
+        "contextHints": {
+          "$ref": "common.schema.json#/$defs/ContextHints"
+        },
+        "workId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "readerExperienceGoal": {
+          "$ref": "#/$defs/Text"
+        },
+        "promiseProgressPayoffPattern": {
+          "$ref": "#/$defs/Text"
+        },
+        "tensionEngine": {
+          "$ref": "#/$defs/Text"
+        },
+        "sceneRhythm": {
+          "$ref": "#/$defs/Text"
+        },
+        "signatureMoves": {
+          "$ref": "#/$defs/TextList"
+        },
+        "evidenceRefIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "coverage": {
+          "$ref": "#/$defs/Text"
+        },
+        "confidence": {
+          "enum": ["low", "medium", "high"]
+        },
+        "mechanismRefIds": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "transferRuleRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/StableId"
+          }
+        },
+        "applicableTaskTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "context-pack.schema.json#/$defs/ContextTaskType"
+          }
+        },
+        "applicableScope": {
+          "$ref": "#/$defs/Text"
+        },
+        "misuseRisks": {
+          "$ref": "#/$defs/TextList"
+        },
+        "doNotCopy": {
+          "$ref": "#/$defs/TextList"
+        },
+        "prohibitedResidue": {
+          "$ref": "#/$defs/TextList"
+        },
+        "currentWorkConflictChecks": {
+          "$ref": "#/$defs/TextList"
+        }
+      }
+    },
+    "MicroTechnique": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "mechanism",
+            "useCase",
+            "constraints",
+            "sourceEvidenceRefs",
+            "transferRuleIds"
+          ],
+          "properties": {
+            "type": {
+              "const": "micro-technique"
+            },
+            "name": {
+              "$ref": "#/$defs/Text"
+            },
+            "mechanism": {
+              "$ref": "#/$defs/Text"
+            },
+            "useCase": {
+              "$ref": "#/$defs/Text"
+            },
+            "constraints": {
+              "$ref": "#/$defs/TextList"
+            },
+            "sourceEvidenceRefs": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            },
+            "transferRuleIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "ImageryRecord": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": ["workId", "imageLabel", "meaning", "firstUseRef", "recurrenceRules", "currentState"],
+          "properties": {
+            "type": {
+              "const": "imagery-record"
+            },
+            "workId": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "imageLabel": {
+              "$ref": "#/$defs/Text"
+            },
+            "meaning": {
+              "$ref": "#/$defs/Text"
+            },
+            "firstUseRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "recurrenceRules": {
+              "$ref": "#/$defs/TextList"
+            },
+            "currentState": {
+              "$ref": "#/$defs/Text"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "BookMechanic": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/BaseObject"
+        },
+        {
+          "type": "object",
+          "required": [
+            "ownerRef",
+            "mechanicName",
+            "mechanicPurpose",
+            "operatingRules",
+            "failureModes",
+            "evidenceRefIds"
+          ],
+          "properties": {
+            "type": {
+              "const": "book-mechanic"
+            },
+            "ownerRef": {
+              "$ref": "common.schema.json#/$defs/StableId"
+            },
+            "mechanicName": {
+              "$ref": "#/$defs/Text"
+            },
+            "mechanicPurpose": {
+              "$ref": "#/$defs/Text"
+            },
+            "operatingRules": {
+              "$ref": "#/$defs/TextList"
+            },
+            "failureModes": {
+              "$ref": "#/$defs/TextList"
+            },
+            "evidenceRefIds": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/StableId"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

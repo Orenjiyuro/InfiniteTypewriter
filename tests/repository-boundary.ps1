@@ -132,7 +132,20 @@ $ignoreSamples = @(
     'ai/jobs/job.json',
     'debug.log',
     'job.stdout',
-    'job.stderr'
+    'job.stderr',
+    '.reasonix/desktop-topic-titles.json',
+    'docs/overview-handoff-2026-06-05.md',
+    'docs/project-overview-for-external-review.md',
+    'docs/code-audit-9.4-9.6.md',
+    'docs/architecture/context-pack-builder-preflight.md',
+    'docs/architecture/schema-source-of-truth.md',
+    'docs/methodology/whole-book-breakdown-methodology.md',
+    'docs/research/local-note.md',
+    'docs/superpowers/plans/local-plan.md',
+    'docs/product/frontend-prototype.html',
+    'docs/product/frontend-high-fidelity-example.png',
+    'docs/product/visual-references/example.png',
+    'docs/维度框架.md'
 )
 
 foreach ($samplePath in $ignoreSamples) {

@@ -222,9 +222,9 @@ pub enum ChangeSetKind {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ContextPack {
+pub struct MethodologySeedBundle {
     pub id: String,
-    pub kind: ContextPackKind,
+    pub kind: MethodologySeedBundleKind,
     pub created_at: IsoDateTime,
     pub updated_at: IsoDateTime,
     pub purpose: String,
@@ -240,17 +240,17 @@ pub struct ContextPack {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
-pub enum ContextPackKind {
-    ContextPack,
+pub enum MethodologySeedBundleKind {
+    MethodologySeedBundle,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EvidenceCardValidationError {
-    missing_fields: Vec<&'static str>,
+    missing_fields: Vec<String>,
 }
 
 impl EvidenceCardValidationError {
-    pub fn missing_fields(&self) -> &[&'static str] {
+    pub fn missing_fields(&self) -> &[String] {
         &self.missing_fields
     }
 }
@@ -259,13 +259,13 @@ pub fn validate_evidence_card_value(value: &Value) -> Result<(), EvidenceCardVal
     let mut missing_fields = Vec::new();
 
     if value.get("evidence").is_none_or(Value::is_null) {
-        missing_fields.push("evidence");
+        missing_fields.push("evidence".to_string());
     } else if value
         .get("evidence")
         .and_then(Value::as_array)
         .is_none_or(Vec::is_empty)
     {
-        missing_fields.push("evidence");
+        missing_fields.push("evidence".to_string());
     } else if let Some(evidence_items) = value.get("evidence").and_then(Value::as_array) {
         for (index, evidence) in evidence_items.iter().enumerate() {
             if !has_text(evidence.get("locator")) {
@@ -278,38 +278,38 @@ pub fn validate_evidence_card_value(value: &Value) -> Result<(), EvidenceCardVal
     }
 
     if value.get("source").is_none_or(Value::is_null) {
-        missing_fields.push("source");
+        missing_fields.push("source".to_string());
     } else if let Some(source) = value.get("source") {
         if !has_text(source.get("sourceId")) {
-            missing_fields.push("source.sourceId");
+            missing_fields.push("source.sourceId".to_string());
         }
         if !has_text(source.get("title")) {
-            missing_fields.push("source.title");
+            missing_fields.push("source.title".to_string());
         }
         if !has_text(source.get("locator")) {
-            missing_fields.push("source.locator");
+            missing_fields.push("source.locator".to_string());
         }
     }
 
     if value.get("coverage").is_none_or(Value::is_null) {
-        missing_fields.push("coverage");
+        missing_fields.push("coverage".to_string());
     } else if let Some(coverage) = value.get("coverage") {
         if !has_text(coverage.get("scope")) {
-            missing_fields.push("coverage.scope");
+            missing_fields.push("coverage.scope".to_string());
         }
         if !has_text(coverage.get("notes")) {
-            missing_fields.push("coverage.notes");
+            missing_fields.push("coverage.notes".to_string());
         }
     }
 
     if value.get("confidence").is_none_or(Value::is_null) {
-        missing_fields.push("confidence");
+        missing_fields.push("confidence".to_string());
     } else if let Some(confidence) = value.get("confidence") {
         if confidence.get("level").is_none_or(Value::is_null) {
-            missing_fields.push("confidence.level");
+            missing_fields.push("confidence.level".to_string());
         }
         if !has_text(confidence.get("rationale")) {
-            missing_fields.push("confidence.rationale");
+            missing_fields.push("confidence.rationale".to_string());
         }
     }
 
@@ -326,16 +326,10 @@ fn has_text(value: Option<&Value>) -> bool {
         .is_some_and(|text| !text.is_empty())
 }
 
-fn evidence_locator_path(index: usize) -> &'static str {
-    match index {
-        0 => "evidence[0].locator",
-        _ => "evidence.locator",
-    }
+fn evidence_locator_path(index: usize) -> String {
+    format!("evidence[{index}].locator")
 }
 
-fn evidence_summary_path(index: usize) -> &'static str {
-    match index {
-        0 => "evidence[0].summary",
-        _ => "evidence.summary",
-    }
+fn evidence_summary_path(index: usize) -> String {
+    format!("evidence[{index}].summary")
 }

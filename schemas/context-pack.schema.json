@@ -1,0 +1,633 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://infinite-typewriter.local/schemas/context-pack.schema.json",
+  "$ref": "#/$defs/ContextPack",
+  "$defs": {
+    "Text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "TextList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Text"
+      }
+    },
+    "HashValue": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "ContextTaskType": {
+      "enum": [
+        "source-breakdown",
+        "creative-discussion",
+        "outline-generation",
+        "character-simulation",
+        "scene-planning",
+        "draft-generation",
+        "style-revision",
+        "continuity-audit",
+        "writeback-suggestion"
+      ]
+    },
+    "SourceBreakdownStage": {
+      "enum": [
+        "segment-extraction",
+        "parent-synthesis",
+        "cross-dimension-review",
+        "draft-review-rerun"
+      ]
+    },
+    "ContextTaskDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceBreakdownStage"],
+      "properties": {
+        "taskType": {
+          "$ref": "#/$defs/ContextTaskType"
+        },
+        "sourceBreakdownStage": {
+          "$ref": "#/$defs/SourceBreakdownStage"
+        },
+        "inputRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        },
+        "outputRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        },
+        "sourceChunkRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        },
+        "originalChunkRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "originalDraftRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "userFeedbackRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "revisionRequestRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "outputSchemaRef": {
+          "$ref": "#/$defs/Text"
+        },
+        "outputSchemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contextHash": {
+          "$ref": "#/$defs/HashValue"
+        }
+      }
+    },
+    "ActivationReason": {
+      "enum": [
+        "target-match",
+        "direct-reference",
+        "context-hint-keyword",
+        "task-default",
+        "change-set-impact",
+        "continuity-dependency",
+        "user-selected",
+        "pinned-required"
+      ]
+    },
+    "EvidenceChainEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "relation", "note"],
+      "properties": {
+        "ref": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "relation": {
+          "$ref": "#/$defs/Text"
+        },
+        "note": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "RelevanceBand": {
+      "enum": ["low", "medium", "high"]
+    },
+    "ConfidenceLevel": {
+      "enum": ["low", "medium", "high"]
+    },
+    "ContextPriority": {
+      "enum": ["required", "high", "normal", "low"]
+    },
+    "FreshnessState": {
+      "enum": ["current", "stale", "superseded", "unknown"]
+    },
+    "UserSelectionState": {
+      "enum": ["auto", "user-included", "user-excluded", "user-pinned"]
+    },
+    "ContextActivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "contextPackId",
+        "sourceRef",
+        "sourceObjectType",
+        "sourceSchemaVersion",
+        "activationReason",
+        "evidenceChain",
+        "relevance",
+        "confidence",
+        "priority",
+        "freshnessState",
+        "userSelection",
+        "selectedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "contextPackId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sourceRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sourceObjectType": {
+          "$ref": "#/$defs/Text"
+        },
+        "sourceSchemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "activationReason": {
+          "$ref": "#/$defs/ActivationReason"
+        },
+        "evidenceChain": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/EvidenceChainEntry"
+          }
+        },
+        "relevance": {
+          "$ref": "#/$defs/RelevanceBand"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        },
+        "priority": {
+          "$ref": "#/$defs/ContextPriority"
+        },
+        "freshnessState": {
+          "$ref": "#/$defs/FreshnessState"
+        },
+        "userSelection": {
+          "$ref": "#/$defs/UserSelectionState"
+        },
+        "selectedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "TokenBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxInputTokens", "reservedOutputTokens", "estimationMethod"],
+      "properties": {
+        "maxInputTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reservedOutputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimationMethod": {
+          "$ref": "#/$defs/Text"
+        }
+      }
+    },
+    "FragmentBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxFragments", "maxFragmentChars"],
+      "properties": {
+        "maxFragments": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxFragmentChars": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "ObjectBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectType", "maxObjects"],
+      "properties": {
+        "objectType": {
+          "$ref": "#/$defs/Text"
+        },
+        "maxObjects": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "PriorityBands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "high", "normal", "low"],
+      "properties": {
+        "required": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "high": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "normal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "low": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "TrimmingStrategy": {
+      "enum": [
+        "drop-low-priority",
+        "summarize-eligible",
+        "latest-confirmed-first",
+        "closest-scope-first",
+        "user-pinned-first"
+      ]
+    },
+    "OverflowPolicy": {
+      "enum": ["fail-closed", "drop-with-exclusion-record"]
+    },
+    "ContextBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "contextPackId",
+        "tokenBudget",
+        "fragmentBudget",
+        "objectBudget",
+        "priorityBands",
+        "trimmingStrategy",
+        "excludedObjectTypes",
+        "excludedRefs",
+        "overflowPolicy"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "contextPackId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "tokenBudget": {
+          "$ref": "#/$defs/TokenBudget"
+        },
+        "fragmentBudget": {
+          "$ref": "#/$defs/FragmentBudget"
+        },
+        "objectBudget": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ObjectBudget"
+          }
+        },
+        "priorityBands": {
+          "$ref": "#/$defs/PriorityBands"
+        },
+        "trimmingStrategy": {
+          "$ref": "#/$defs/TrimmingStrategy"
+        },
+        "excludedObjectTypes": {
+          "$ref": "#/$defs/TextList"
+        },
+        "excludedRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        },
+        "overflowPolicy": {
+          "$ref": "#/$defs/OverflowPolicy"
+        }
+      }
+    },
+    "ManifestHashEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "hash"],
+      "properties": {
+        "ref": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "hash": {
+          "$ref": "#/$defs/HashValue"
+        }
+      }
+    },
+    "SchemaVersionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaId", "version"],
+      "properties": {
+        "schemaId": {
+          "$ref": "#/$defs/Text"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "ContextHash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "schemaVersionMap",
+        "libraryManifestHash",
+        "sourceHashRefs",
+        "changeSetRefs",
+        "changeSetHash",
+        "selectionPolicyVersion",
+        "includedItemHashes",
+        "activationHashes",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "enum": ["sha256"]
+        },
+        "canonicalization": {
+          "enum": ["json-canonical-v1"]
+        },
+        "schemaVersionMap": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SchemaVersionEntry"
+          }
+        },
+        "libraryManifestHash": {
+          "$ref": "#/$defs/HashValue"
+        },
+        "sourceHashRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "changeSetRefs": {
+          "$ref": "common.schema.json#/$defs/StableIdList"
+        },
+        "changeSetHash": {
+          "$ref": "#/$defs/HashValue"
+        },
+        "selectionPolicyVersion": {
+          "$ref": "#/$defs/Text"
+        },
+        "promptTemplateVersion": {
+          "$ref": "#/$defs/Text"
+        },
+        "includedItemHashes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "activationHashes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "excludedItemHashes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ManifestHashEntry"
+          }
+        },
+        "value": {
+          "$ref": "#/$defs/HashValue"
+        }
+      }
+    },
+    "ContextExclusionReason": {
+      "enum": [
+        "budget-insufficient",
+        "stale-or-superseded",
+        "user-excluded",
+        "permission-boundary",
+        "task-irrelevant",
+        "insufficient-evidence",
+        "duplicate-or-covered",
+        "schema-unsupported",
+        "source-boundary",
+        "not-in-selected-scope"
+      ]
+    },
+    "ContextExclusionRiskKind": {
+      "enum": [
+        "privacy-boundary",
+        "copyright-boundary",
+        "stale-state",
+        "budget-overflow",
+        "irrelevant",
+        "low-confidence",
+        "user-choice",
+        "permission-denied",
+        "unsupported-schema"
+      ]
+    },
+    "ContextExclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "contextPackId",
+        "excludedRef",
+        "sourceObjectType",
+        "reason",
+        "riskKind",
+        "explanation",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "contextPackId": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "excludedRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sourceObjectType": {
+          "$ref": "#/$defs/Text"
+        },
+        "reason": {
+          "$ref": "#/$defs/ContextExclusionReason"
+        },
+        "riskKind": {
+          "$ref": "#/$defs/ContextExclusionRiskKind"
+        },
+        "explanation": {
+          "$ref": "#/$defs/Text"
+        },
+        "candidateScore": {
+          "$ref": "#/$defs/RelevanceBand"
+        },
+        "wouldFitIfBudget": {
+          "type": "boolean"
+        },
+        "relatedActivationRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "ContextIncludedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRef",
+        "sourceObjectType",
+        "sourceSchemaVersion",
+        "contentHash",
+        "activationRef"
+      ],
+      "properties": {
+        "sourceRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "sourceObjectType": {
+          "$ref": "#/$defs/Text"
+        },
+        "sourceSchemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contentHash": {
+          "$ref": "#/$defs/HashValue"
+        },
+        "activationRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        }
+      }
+    },
+    "ContextPack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "type",
+        "label",
+        "createdAt",
+        "updatedAt",
+        "status",
+        "tags",
+        "metadata",
+        "auditTrail",
+        "taskType",
+        "targetRef",
+        "activations",
+        "includedItems",
+        "exclusions",
+        "budget",
+        "contextHash",
+        "createdForTaskRef"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "type": {
+          "const": "context-pack"
+        },
+        "label": {
+          "$ref": "#/$defs/Text"
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "updatedAt": {
+          "$ref": "common.schema.json#/$defs/IsoDateTime"
+        },
+        "status": {
+          "$ref": "common.schema.json#/$defs/ObjectStatus"
+        },
+        "tags": {
+          "$ref": "#/$defs/TextList"
+        },
+        "metadata": {
+          "$ref": "common.schema.json#/$defs/Metadata"
+        },
+        "auditTrail": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/AuditTrailEntry"
+          }
+        },
+        "contextHints": {
+          "$ref": "common.schema.json#/$defs/ContextHints"
+        },
+        "taskType": {
+          "$ref": "#/$defs/ContextTaskType"
+        },
+        "taskDescriptor": {
+          "$ref": "#/$defs/ContextTaskDescriptor"
+        },
+        "targetRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "activations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContextActivation"
+          }
+        },
+        "includedItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContextIncludedItem"
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContextExclusion"
+          }
+        },
+        "budget": {
+          "$ref": "#/$defs/ContextBudget"
+        },
+        "contextHash": {
+          "$ref": "#/$defs/ContextHash"
+        },
+        "createdForTaskRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        },
+        "createdForJobRef": {
+          "$ref": "common.schema.json#/$defs/StableId"
+        }
+      }
+    }
+  }
+}

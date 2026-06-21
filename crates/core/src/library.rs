@@ -7,7 +7,21 @@ use rusqlite::{params, Connection};
 
 use crate::model::{create_empty_manifest, LibraryManifest, LibraryRoot};
 
-const LOCAL_DIRECTORIES: &[&str] = &["sources", "analyses", "works", "runs", "recipes", "indexes"];
+const LOCAL_DIRECTORIES: &[&str] = &[
+    "sources",
+    "analyses",
+    "works",
+    "runs",
+    "recipes",
+    "indexes",
+    "drafts",
+    "revisions",
+    "backups",
+    "migrations",
+    "transferable-assets",
+    "craft-references",
+    "breakdowns",
+];
 
 #[derive(Debug)]
 pub enum LibraryError {
@@ -93,6 +107,7 @@ fn initialize_catalog(
             id TEXT PRIMARY KEY,
             label TEXT NOT NULL,
             schema_version INTEGER NOT NULL,
+            last_writer_version TEXT NOT NULL,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
@@ -119,23 +134,122 @@ fn initialize_catalog(
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS reference_books (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            source_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS breakdown_projects (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            source_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS provider_runs (
+            id TEXT PRIMARY KEY,
+            provider_job_ref TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS drafts (
+            id TEXT PRIMARY KEY,
+            target_ref TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS revision_requests (
+            id TEXT PRIMARY KEY,
+            target_ref TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS change_sets (
+            id TEXT PRIMARY KEY,
+            target_ref TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS transferable_assets (
+            id TEXT PRIMARY KEY,
+            mechanism_ref TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS craft_references (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS library_status (
+            id TEXT PRIMARY KEY,
+            schema_version INTEGER NOT NULL,
+            backup_restore_status_json TEXT NOT NULL,
+            migration_status_json TEXT NOT NULL,
+            export_policy_json TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
         "#,
     )?;
 
     connection.execute(
         r#"
-        INSERT INTO library_manifest (id, label, schema_version, created_at, updated_at)
-        VALUES (?1, ?2, ?3, ?4, ?5)
+        INSERT INTO library_manifest (id, label, schema_version, last_writer_version, created_at, updated_at)
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6)
         ON CONFLICT(id) DO UPDATE SET
             label = excluded.label,
             schema_version = excluded.schema_version,
+            last_writer_version = excluded.last_writer_version,
             updated_at = excluded.updated_at
         "#,
         params![
             manifest.root.id,
             manifest.root.label,
             manifest.schema_version,
+            manifest.last_writer_version,
             manifest.created_at,
+            manifest.updated_at
+        ],
+    )?;
+    let backup_restore_status_json = serde_json::to_string(&manifest.backup_restore_status)?;
+    let migration_status_json = serde_json::to_string(&manifest.migration_status)?;
+    let export_policy_json = serde_json::to_string(&manifest.export_policy)?;
+    connection.execute(
+        r#"
+        INSERT INTO library_status (
+            id,
+            schema_version,
+            backup_restore_status_json,
+            migration_status_json,
+            export_policy_json,
+            updated_at
+        )
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+        ON CONFLICT(id) DO UPDATE SET
+            schema_version = excluded.schema_version,
+            backup_restore_status_json = excluded.backup_restore_status_json,
+            migration_status_json = excluded.migration_status_json,
+            export_policy_json = excluded.export_policy_json,
+            updated_at = excluded.updated_at
+        "#,
+        params![
+            manifest.root.id,
+            manifest.schema_version,
+            backup_restore_status_json,
+            migration_status_json,
+            export_policy_json,
             manifest.updated_at
         ],
     )?;
@@ -167,13 +281,32 @@ mod tests {
         )
         .expect("empty library should initialize");
 
-        assert_eq!(manifest.schema_version, 1);
+        assert_eq!(manifest.schema_version, 2);
         assert_eq!(manifest.root.id, "root-local-demo");
         assert!(manifest.sources.is_empty());
         assert!(manifest.works.is_empty());
         assert!(manifest.analyses.is_empty());
+        assert!(manifest.revision_requests.is_empty());
+        assert!(manifest.change_sets.is_empty());
+        assert!(manifest.backup_restore_status.user_confirmation_required);
+        assert!(manifest.migration_status.user_confirmation_required);
+        assert!(!manifest.export_policy.export_provider_secrets);
 
-        for directory in ["sources", "analyses", "works", "runs", "recipes", "indexes"] {
+        for directory in [
+            "sources",
+            "analyses",
+            "works",
+            "runs",
+            "recipes",
+            "indexes",
+            "drafts",
+            "revisions",
+            "backups",
+            "migrations",
+            "transferable-assets",
+            "craft-references",
+            "breakdowns",
+        ] {
             assert!(
                 root_path.join(directory).is_dir(),
                 "{directory} should exist"
@@ -182,7 +315,8 @@ mod tests {
 
         let manifest_json = fs::read_to_string(root_path.join("manifest.json"))
             .expect("manifest should be written");
-        assert!(manifest_json.contains("\"schemaVersion\": 1"));
+        assert!(manifest_json.contains("\"schemaVersion\": 2"));
+        assert!(manifest_json.contains("\"exportProviderSecrets\": false"));
 
         fs::remove_dir_all(root_path).expect("test library should clean up");
     }
@@ -203,7 +337,7 @@ mod tests {
             .expect("catalog opens");
         let table_count: u32 = connection
             .query_row(
-                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('library_manifest', 'sources', 'works', 'analyses')",
+                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('library_manifest', 'sources', 'works', 'analyses', 'reference_books', 'breakdown_projects', 'provider_runs', 'drafts', 'revision_requests', 'change_sets', 'transferable_assets', 'craft_references', 'library_status')",
                 [],
                 |row| row.get(0),
             )
@@ -214,7 +348,7 @@ mod tests {
             })
             .expect("manifest row should be queryable");
 
-        assert_eq!(table_count, 4);
+        assert_eq!(table_count, 13);
         assert_eq!(manifest_count, 1);
 
         drop(connection);
